@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Carrera {
+  idCarrera   Int          @id @default(autoincrement())
+  nombre      String
+  area        String
+  plantel     String?
+  expedientes Expediente[]
+
+  @@map("cat_carreras")
+}
+
+model Coordinador {
+  idCoordinador  Int          @id @default(autoincrement())
+  nombreCompleto String
+  programa       String?
+  expedientes    Expediente[]
+
+  @@map("cat_coordinadores")
+}
+
+model Expediente {
+  idExpediente   Int                    @id @default(autoincrement())
+  clave          String                 @unique
+  nombreAlumno   String
+  sexo           String                 // 'H', 'M', 'O'
+  tipoPrograma   String                 // 'SS' o 'PP'
+  idCarrera      Int
+  idCoordinador  Int
+  fechaInicio    DateTime
+  fechaTentativa DateTime
+  fechaTermino   DateTime?
+  estatus        String                 @default("Activo") // 'Activo', 'Terminado', 'Declinado'
+  createdAt      DateTime               @default(now())
+
+  carrera        Carrera                @relation(fields: [idCarrera], references: [idCarrera], onDelete: Restrict)
+  coordinador    Coordinador            @relation(fields: [idCoordinador], references: [idCoordinador], onDelete: Restrict)
+  seguimiento    SeguimientoDocumental?
+
+  @@map("expedientes")
+}
+
+model SeguimientoDocumental {
+  idSeguimiento   Int        @id @default(autoincrement())
+  idExpediente    Int        @unique
+  preRegistro     DateTime?
+  registro        DateTime?
+  cartaAceptacion Boolean    @default(false)
+  informeFinalUrl String?
+  cartaTermino    Boolean    @default(false)
+  declinacionObs  String?
+
+  expediente      Expediente @relation(fields: [idExpediente], references: [idExpediente], onDelete: Cascade)
+
+  @@map("seguimiento_documental")
+}
