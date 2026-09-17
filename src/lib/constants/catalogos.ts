@@ -1,0 +1,111 @@
+export const GRADOS_ACADEMICOS = [
+    'Lic.',
+    'Mtro.',
+    'Mtra.',
+    'Dr.',
+    'Dra.',
+    'Ing.',
+    'Esp.',
+    'C.',
+  ];
+  
+  export const SEMESTRES_UNAM = [
+    '6to Semestre',
+    '7mo Semestre',
+    '8vo Semestre',
+    '9no Semestre',
+    '10mo Semestre',
+    'Pasante / Egresado',
+  ];
+  
+  export const CICLOS_ESCOLARES = [
+    '2026-1',
+    '2026-2',
+    '2027-1',
+    '2027-2',
+    '2028-1',
+  ];
+  
+  export const UBICACIONES_DEPENDENCIA = [
+    'Sede Central PUIC (Loreto)',
+    'Sede Externa (Oaxaca)',
+  ];
+  
+  export const MODALIDADES = ['Presencial', 'A Distancia', 'Mixta'];
+  
+  export const TURNOS = ['Matutino', 'Vespertino', 'Mixto'];
+  
+  export const PLANTELES_UNAM = [
+    'Facultad de Artes y Diseño (FAD)',
+    'Facultad de Ciencias',
+    'Facultad de Ciencias Políticas y Sociales (FCPyS)',
+    'Facultad de Contaduría y Administración (FCA)',
+    'Facultad de Derecho',
+    'Facultad de Economía',
+    'Facultad de Filosofía y Letras (FFyL)',
+    'Facultad de Ingeniería',
+    'Facultad de Medicina',
+    'Facultad de Odontología',
+    'Facultad de Psicología',
+    'Facultad de Química',
+    'Facultad de Medicina Veterinaria y Zootecnia (FMVZ)',
+    'FES Acatlán',
+    'FES Aragón',
+    'FES Cuautitlán',
+    'FES Iztacala',
+    'FES Zaragoza',
+    'Escuela Nacional de Trabajo Social (ENTS)',
+    'Escuela Nacional de Lenguas, Lingüística y Traducción (ENALLT)',
+    'Escuela Nacional de Artes Cinematográficas (ENAC)',
+    'Escuela Nacional de Enfermería y Obstetricia (ENEO)',
+  ];
+  
+  export const CARRERAS_UNAM = [
+    'Actuaría',
+    'Administración',
+    'Administración Agropecuaria',
+    'Antropología',
+    'Arquitectura',
+    'Arquitectura de Paisaje',
+    'Artes Visuales',
+    'Biología',
+    'Ciencia de Datos',
+    'Ciencia Forense',
+    'Ciencias de la Comunicación',
+    'Ciencias de la Computación',
+    'Ciencias Políticas y Administración Pública',
+    'Contaduría',
+    'Derecho',
+    'Desarrollo Comunitario para el Envejecimiento',
+    'Desarrollo y Gestión Interculturales',
+    'Diseño Gráfico',
+    'Diseño y Comunicación Visual',
+    'Economía',
+    'Enfermería',
+    'Estudios Latinoamericanos',
+    'Filosofía',
+    'Física',
+    'Geografía',
+    'Historia',
+    'Informática',
+    'Ingeniería Civil',
+    'Ingeniería en Computación',
+    'Ingeniería Eléctrica y Electrónica',
+    'Ingeniería Industrial',
+    'Ingeniería Mecánica',
+    'Ingeniería Mecatrónica',
+    'Ingeniería Química',
+    'Lengua y Literaturas Hispánicas',
+    'Matemáticas',
+    'Medicina Cirujano',
+    'Medicina Veterinaria y Zootecnia',
+    'Nutriología',
+    'Odontología',
+    'Pedagogía',
+    'Psicología',
+    'Química',
+    'Química Farmacéutico Biológica',
+    'Relaciones Internacionales',
+    'Sociología',
+    'Trabajo Social',
+  ].sort();

@@ -1,64 +1,86 @@
-generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/client"
-}
-
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Plantel {
+  idPlantel   Int          @id @default(autoincrement())
+  nombre      String       @unique
+  siglas      String?
+  expedientes Expediente[]
 }
 
 model Carrera {
   idCarrera   Int          @id @default(autoincrement())
-  nombre      String
-  area        String
-  plantel     String?
+  nombre      String       @unique
   expedientes Expediente[]
-
-  @@map("cat_carreras")
 }
 
 model Coordinador {
   idCoordinador  Int          @id @default(autoincrement())
   nombreCompleto String
-  programa       String?
+  gradoAcademico String       // Ej. "Lic.", "Mtro.", "Dra.", "Ing."
   expedientes    Expediente[]
-
-  @@map("cat_coordinadores")
 }
 
 model Expediente {
-  idExpediente   Int                    @id @default(autoincrement())
-  clave          String                 @unique
-  nombreAlumno   String
-  sexo           String                 // 'H', 'M', 'O'
-  tipoPrograma   String                 // 'SS' o 'PP'
-  idCarrera      Int
-  idCoordinador  Int
-  fechaInicio    DateTime
-  fechaTentativa DateTime
-  fechaTermino   DateTime?
-  estatus        String                 @default("Activo") // 'Activo', 'Terminado', 'Declinado'
-  createdAt      DateTime               @default(now())
-
-  carrera        Carrera                @relation(fields: [idCarrera], references: [idCarrera], onDelete: Restrict)
-  coordinador    Coordinador            @relation(fields: [idCoordinador], references: [idCoordinador], onDelete: Restrict)
-  seguimiento    SeguimientoDocumental?
-
-  @@map("expedientes")
+  idExpediente         Int                   @id @default(autoincrement())
+  clave                String                @unique // SS-[NoCuenta]-[Año]
+  
+  // Datos del Alumno
+  nombre               String
+  apPaterno            String
+  apMaterno            String
+  numeroCuenta         String                // 9 dígitos UNAM
+  correoElectronico    String
+  telefono             String
+  edad                 Int
+  sexo                 String                // "H", "M", "O"
+  semestre             String                // "6to", "7mo", "8vo", etc.
+  
+  // Datos Académicos
+  idPlantel            Int
+  plantel              Plantel               @relation(fields: [idPlantel], references: [idPlantel])
+  idCarrera            Int
+  carrera              Carrera               @relation(fields: [idCarrera], references: [idCarrera])
+  
+  // Datos del Programa
+  tipoPrograma         String                // "SS" | "PP"
+  clavePrograma        String                // Clave oficial DGOAE / SIASS
+  nombrePrograma       String                // Nombre oficial del programa registrado
+  cicloEscolar         String                // "2026-1", "2026-2", etc.
+  ubicacionDependencia String                // Sede 1 o Sede 2
+  modalidad            String                // "Presencial", "A Distancia", "Mixta"
+  turno                String                // "Matutino", "Vespertino", "Mixto"
+  
+  idCoordinador        Int
+  coordinador          Coordinador           @relation(fields: [idCoordinador], references: [idCoordinador])
+  
+  // Tiempos y Control
+  fechaInicio          DateTime
+  fechaTentativa       DateTime
+  fechaTermino         DateTime?
+  estatus              String                @default("Activo") // "Activo", "Terminado", "Declinado"
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  
+  seguimiento          SeguimientoDocumental?
 }
 
 model SeguimientoDocumental {
   idSeguimiento   Int        @id @default(autoincrement())
   idExpediente    Int        @unique
+  expediente      Expediente @relation(fields: [idExpediente], references: [idExpediente], onDelete: Cascade)
+  
   preRegistro     DateTime?
   registro        DateTime?
   cartaAceptacion Boolean    @default(false)
   informeFinalUrl String?
   cartaTermino    Boolean    @default(false)
   declinacionObs  String?
-
-  expediente      Expediente @relation(fields: [idExpediente], references: [idExpediente], onDelete: Cascade)
-
-  @@map("seguimiento_documental")
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 }

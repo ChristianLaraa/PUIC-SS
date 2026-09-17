@@ -53,32 +53,80 @@ export async function getExpedienteById(id: number) {
 
 export async function registrarExpediente(data: {
   clave: string;
-  nombreAlumno: string;
+  // Datos del alumno
+  nombre: string;
+  apPaterno: string;
+  apMaterno: string;
+  numeroCuenta: string;
+  correoElectronico: string;
+  telefono: string;
+  edad: number;
   sexo: string;
-  tipoPrograma: string;
+  semestre: string;
+  // Adscripción
+  plantelNombre: string;
   carreraNombre: string;
-  area: string;
+  // Programa
+  tipoPrograma: string;
+  clavePrograma: string;
+  nombrePrograma: string;
+  cicloEscolar: string;
+  ubicacionDependencia: string;
+  modalidad: string;
+  turno: string;
+  // Coordinador
+  coordinadorGrado: string;
   coordinadorNombre: string;
+  // Tiempos
   fechaInicio: string;
   fechaTentativa: string;
   preRegistro?: string;
   registro?: string;
 }) {
-  const carrera = await prisma.carrera.create({
-    data: { nombre: data.carreraNombre, area: data.area },
+  // Asegurar o crear Plantel
+  const plantel = await prisma.plantel.upsert({
+    where: { nombre: data.plantelNombre },
+    update: {},
+    create: { nombre: data.plantelNombre },
   });
 
+  // Asegurar o crear Carrera
+  const carrera = await prisma.carrera.upsert({
+    where: { nombre: data.carreraNombre },
+    update: {},
+    create: { nombre: data.carreraNombre },
+  });
+
+  // Crear Coordinador con su grado académico
   const coordinador = await prisma.coordinador.create({
-    data: { nombreCompleto: data.coordinadorNombre },
+    data: {
+      nombreCompleto: data.coordinadorNombre,
+      gradoAcademico: data.coordinadorGrado,
+    },
   });
 
+  // Crear Expediente completo
   await prisma.expediente.create({
     data: {
       clave: data.clave,
-      nombreAlumno: data.nombreAlumno,
+      nombre: data.nombre,
+      apPaterno: data.apPaterno,
+      apMaterno: data.apMaterno,
+      numeroCuenta: data.numeroCuenta,
+      correoElectronico: data.correoElectronico,
+      telefono: data.telefono,
+      edad: Number(data.edad),
       sexo: data.sexo,
-      tipoPrograma: data.tipoPrograma,
+      semestre: data.semestre,
+      idPlantel: plantel.idPlantel,
       idCarrera: carrera.idCarrera,
+      tipoPrograma: data.tipoPrograma,
+      clavePrograma: data.clavePrograma,
+      nombrePrograma: data.nombrePrograma,
+      cicloEscolar: data.cicloEscolar,
+      ubicacionDependencia: data.ubicacionDependencia,
+      modalidad: data.modalidad,
+      turno: data.turno,
       idCoordinador: coordinador.idCoordinador,
       fechaInicio: new Date(data.fechaInicio),
       fechaTentativa: new Date(data.fechaTentativa),

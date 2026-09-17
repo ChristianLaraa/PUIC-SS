@@ -20,13 +20,16 @@ export function obtenerDiasRestantes(fechaTentativa: Date | string) {
 
 export function generarClaveExpediente(
   tipo: 'SS' | 'PP',
-  rfc: string,
-  fechaRegistro: string
+  numeroCuenta: string,
+  fechaInicio: string
 ): string {
-  if (!rfc || !fechaRegistro) return '';
-  const [anio, mes, dia] = fechaRegistro.split('-');
-  return `${tipo}${rfc.trim().toUpperCase()}${dia}${mes}${anio}`;
+  if (!numeroCuenta || !fechaInicio) return '';
+  const cleanCuenta = numeroCuenta.replace(/\D/g, ''); // Solo números
+  const [year, month, day] = fechaInicio.split('-');
+  const shortYear = year ? year.slice(-2) : '';
+  return `${tipo}-${cleanCuenta}-${day}${month}${shortYear}`;
 }
+
 
 export function calcularFechaTentativa(fechaInicio: string): string {
   if (!fechaInicio) return '';
