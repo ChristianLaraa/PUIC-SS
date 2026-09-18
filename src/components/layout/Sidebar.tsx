@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, FolderOpen, UserPlus } from 'lucide-react';
@@ -18,18 +19,30 @@ export default function Sidebar() {
       {/* Cabecera Institucional con Logos */}
       <div className="p-5 border-b border-blue-900/60 bg-[#002B7A]/40 flex flex-col items-center text-center gap-2">
         <div className="flex items-center justify-center gap-3">
-          {/* Espacio para Escudo UNAM */}
-          <div className="w-10 h-10 rounded-full bg-white/10 border border-[#D59F0F] flex items-center justify-center text-[10px] font-bold text-[#D59F0F] tracking-tighter">
-            UNAM
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-transparent p-1 ring-1 ring-[#D59F0F]">
+            <Image
+              src="/unam.png"
+              alt="Escudo de la UNAM"
+              width={40}
+              height={44}
+              priority
+              className="h-10 w-auto object-contain"
+            />
           </div>
           <span className="text-slate-400 text-xs">|</span>
-          {/* Espacio para Logo PUIC */}
-          <div className="px-2 py-1 rounded bg-[#D59F0F]/15 border border-[#D59F0F]/40 text-xs font-bold text-[#D59F0F] tracking-wider">
-            PUIC
+          <div className="flex h-12 w-20 items-center justify-center">
+            <Image
+              src="/puic.png"
+              alt="Logo del PUIC"
+              width={80}
+              height={45}
+              priority
+              className="h-11 w-auto object-contain"
+            />
           </div>
         </div>
-        <div>
-          <h2 className="text-base font-bold text-white tracking-wide">Sistema PUIC</h2>
+        <div><br></br>
+          <h2 className="text-base font-bold text-white tracking-wide"> Programa Universitario de Estudios de la Diversidad Cultural y de la Interculturalidad </h2><br></br>
           <p className="text-[11px] text-[#D59F0F] font-medium">Servicio Social y Prácticas</p>
         </div>
       </div>
@@ -60,8 +73,8 @@ export default function Sidebar() {
 
       {/* Pie Institucional */}
       <div className="p-4 border-t border-blue-900/60 text-center">
-        <p className="text-[11px] text-slate-400">UNAM • Coordinación de Humanidades</p>
-        <p className="text-[10px] text-[#D59F0F] mt-0.5">Gestión Institucional v2.0</p>
+        <p className="text-[11px] text-slate-400">UNAM • PUIC - 2026</p>
+        <p className="text-[10px] text-[#D59F0F] mt-0.5"></p>
       </div>
     </aside>
   );

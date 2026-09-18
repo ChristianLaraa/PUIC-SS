@@ -34,7 +34,9 @@ export default async function ExpedienteDetallePage({ params }: PageProps) {
       <div className="flex items-center justify-between border-b pb-4">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900">{expediente.nombreAlumno}</h1>
+            <h1 className="text-2xl font-bold text-slate-900">
+              {expediente.nombre} {expediente.apPaterno} {expediente.apMaterno}
+            </h1>
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${badgeColor}`}>
               {expediente.estatus}
             </span>
@@ -62,8 +64,8 @@ export default async function ExpedienteDetallePage({ params }: PageProps) {
           <p className="font-semibold text-slate-800 mt-0.5">{expediente.carrera.nombre}</p>
         </div>
         <div>
-          <span className="text-xs font-semibold text-slate-400 uppercase">Área / Proyecto</span>
-          <p className="font-semibold text-slate-800 mt-0.5">{expediente.carrera.area}</p>
+          <span className="text-xs font-semibold text-slate-400 uppercase">Programa / Proyecto</span>
+          <p className="font-semibold text-slate-800 mt-0.5">{expediente.nombrePrograma}</p>
         </div>
         <div>
           <span className="text-xs font-semibold text-slate-400 uppercase">Coordinador</span>

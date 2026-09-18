@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 export async function getExpedientes() {
   return prisma.expediente.findMany({
     include: {
+      plantel: true,
       carrera: true,
       coordinador: true,
       seguimiento: true,
@@ -16,15 +17,27 @@ export async function getExpedientes() {
 }
 
 export async function getDashboardData() {
-  const [totalActivos, totalSS, totalPP, totalTerminados, expedientesActivos] = await Promise.all([
+  const [
+    totalExpedientes,
+    totalActivos,
+    totalSS,
+    totalPP,
+    totalTerminados,
+    totalDeclinados,
+    expedientes,
+  ] = await Promise.all([
+    prisma.expediente.count(),
     prisma.expediente.count({ where: { estatus: 'Activo' } }),
     prisma.expediente.count({ where: { estatus: 'Activo', tipoPrograma: 'SS' } }),
     prisma.expediente.count({ where: { estatus: 'Activo', tipoPrograma: 'PP' } }),
     prisma.expediente.count({ where: { estatus: 'Terminado' } }),
+    prisma.expediente.count({ where: { estatus: 'Declinado' } }),
     prisma.expediente.findMany({
-      where: { estatus: 'Activo' },
-      include: { carrera: true, coordinador: true },
-      orderBy: { fechaTentativa: 'asc' },
+      include: {
+        plantel: true,
+        carrera: true,
+        coordinador: true,
+      },
     }),
   ]);
 
@@ -32,12 +45,59 @@ export async function getDashboardData() {
   const limite30Dias = new Date();
   limite30Dias.setDate(hoy.getDate() + 30);
 
-  const alertas = expedientesActivos.filter((exp) => {
-    const ft = new Date(exp.fechaTentativa);
-    return ft <= limite30Dias;
+  // Alertas de vencimiento
+  const activos = expedientes.filter((e) => e.estatus === 'Activo');
+  const vencidos = activos.filter((e) => new Date(e.fechaTentativa) < hoy);
+  const proximosAVencer = activos.filter((e) => {
+    const ft = new Date(e.fechaTentativa);
+    return ft >= hoy && ft <= limite30Dias;
   });
 
-  return { totalActivos, totalSS, totalPP, totalTerminados, alertas };
+  // Tasa de conclusión
+  const totalCerrados = totalTerminados + totalDeclinados;
+  const tasaExito = totalCerrados > 0 ? Math.round((totalTerminados / totalCerrados) * 100) : 100;
+
+  // Distribución por Modalidad
+  const modalidades = {
+    Presencial: activos.filter((e) => e.modalidad === 'Presencial').length,
+    'A Distancia': activos.filter((e) => e.modalidad === 'A Distancia').length,
+    Mixta: activos.filter((e) => e.modalidad === 'Mixta').length,
+  };
+
+  // Top Planteles
+  const plantelesCount: Record<string, number> = {};
+  expedientes.forEach((e) => {
+    const nombre = e.plantel?.nombre || 'Sin Plantel';
+    plantelesCount[nombre] = (plantelesCount[nombre] || 0) + 1;
+  });
+  const topPlanteles = Object.entries(plantelesCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4);
+
+  // Top Carreras
+  const carrerasCount: Record<string, number> = {};
+  expedientes.forEach((e) => {
+    const nombre = e.carrera?.nombre || 'Sin Carrera';
+    carrerasCount[nombre] = (carrerasCount[nombre] || 0) + 1;
+  });
+  const topCarreras = Object.entries(carrerasCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4);
+
+  return {
+    totalExpedientes,
+    totalActivos,
+    totalSS,
+    totalPP,
+    totalTerminados,
+    totalDeclinados,
+    tasaExito,
+    vencidos,
+    proximosAVencer,
+    modalidades,
+    topPlanteles,
+    topCarreras,
+  };
 }
 
 export async function getExpedienteById(id: number) {
@@ -206,4 +266,3 @@ export async function registrarDeclinacion(idExpediente: number, observaciones: 
   revalidatePath('/expedientes');
   revalidatePath('/');
 }
-

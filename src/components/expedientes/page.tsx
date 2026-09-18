@@ -1,8 +1,13 @@
-export default function ExpedientesPage() {
-    return (
-      <div className="p-6 space-y-4">
-        <h1 className="text-2xl font-bold text-slate-900">Módulo de Expedientes</h1>
-        <p className="text-slate-600">Página cargada con éxito.</p>
-      </div>
-    );
-  }
+import { Suspense } from 'react';
+import { getExpedientes } from '@/actions/expedientes';
+import ExpedientesDirectory from '@/components/expedientes/ExpedientesDirectory';
+
+export default async function ExpedientesPage() {
+  const expedientes = await getExpedientes();
+
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-slate-400">Cargando directorio institucional...</div>}>
+      <ExpedientesDirectory expedientes={expedientes} />
+    </Suspense>
+  );
+}
