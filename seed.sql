@@ -1,151 +1,186 @@
--- Datos de demostración para SQLite.
--- Es idempotente: puedes ejecutarlo varias veces sin duplicar registros.
-BEGIN TRANSACTION;
+-- Limpieza previa opcional (descomentar si quieres vaciar las tablas antes)
+-- DELETE FROM SeguimientoDocumental;
+-- DELETE FROM Expediente;
+-- DELETE FROM Coordinador;
+-- DELETE FROM Carrera;
+-- DELETE FROM Plantel;
 
-INSERT OR IGNORE INTO "Plantel" ("nombre", "siglas") VALUES
-  ('Facultad de Ciencias', 'FC'),
-  ('Facultad de Ingeniería', 'FI'),
-  ('Facultad de Ciencias Políticas y Sociales (FCPyS)', 'FCPyS'),
-  ('Facultad de Psicología', 'FP'),
-  ('FES Acatlán', 'FES-A'),
-  ('FES Zaragoza', 'FES-Z'),
-  ('Facultad de Medicina', 'FM');
+-- 1. PLANTELES UNAM
+INSERT INTO Plantel (idPlantel, nombre, siglas) VALUES
+(1, 'FES Aragón', 'FES-A'),
+(2, 'Facultad de Filosofía y Letras (FFyL)', 'FFyL'),
+(3, 'Facultad de Ciencias Políticas y Sociales (FCPyS)', 'FCPyS'),
+(4, 'Facultad de Ingeniería', 'FI'),
+(5, 'Escuela Nacional de Trabajo Social (ENTS)', 'ENTS');
 
-INSERT OR IGNORE INTO "Carrera" ("nombre") VALUES
-  ('Actuaría'),
-  ('Ciencia de Datos'),
-  ('Ciencias de la Comunicación'),
-  ('Derecho'),
-  ('Ingeniería en Computación'),
-  ('Medicina Cirujano'),
-  ('Psicología'),
-  ('Relaciones Internacionales');
+-- 2. CARRERAS UNAM
+INSERT INTO Carrera (idCarrera, nombre) VALUES
+(1, 'Ingeniería en Computación'),
+(2, 'Desarrollo y Gestión Interculturales'),
+(3, 'Sociología'),
+(4, 'Derecho'),
+(5, 'Trabajo Social'),
+(6, 'Diseño y Comunicación Visual');
 
-INSERT OR IGNORE INTO "Coordinador" ("nombreCompleto", "gradoAcademico") VALUES
-  ('Mariana López Hernández', 'Mtra.'),
-  ('Jorge Alberto Ramírez Soto', 'Dr.'),
-  ('Elena Martínez Cruz', 'Lic.'),
-  ('Roberto Sánchez Morales', 'Ing.'),
-  ('Patricia García Torres', 'Dra.');
+-- 3. COORDINADORES / RESPONSABLES DE PROGRAMA
+INSERT INTO Coordinador (idCoordinador, nombreCompleto, gradoAcademico) VALUES
+(1, 'Roberto Sánchez Morales', 'Dr.'),
+(2, 'María Elena Gómez Tagle', 'Mtra.'),
+(3, 'Carlos Mendoza Albarrán', 'Lic.'),
+(4, 'Ana Karen Domínguez', 'Ing.');
 
-INSERT OR IGNORE INTO "Expediente" (
-  "clave", "nombre", "apPaterno", "apMaterno", "numeroCuenta", "correoElectronico",
-  "telefono", "edad", "sexo", "semestre", "idPlantel", "idCarrera", "tipoPrograma",
-  "clavePrograma", "nombrePrograma", "cicloEscolar", "ubicacionDependencia", "modalidad",
-  "turno", "idCoordinador", "fechaInicio", "fechaTentativa", "fechaTermino", "estatus",
-  "createdAt", "updatedAt"
-) VALUES
-  ('SS-421123456-2026', 'Ana Sofía', 'García', 'Mendoza', '421123456', 'ana.garcia@comunidad.unam.mx',
-   '55 1234 5678', 21, 'M', '8vo Semestre',
-   (SELECT "idPlantel" FROM "Plantel" WHERE "nombre" = 'Facultad de Ciencias'),
-   (SELECT "idCarrera" FROM "Carrera" WHERE "nombre" = 'Ciencia de Datos'), 'SS', 'SS-2026-014',
-   'Análisis de información para proyectos culturales', '2026-2', 'Sede Central PUIC (Loreto)', 'Mixta', 'Matutino',
-   (SELECT "idCoordinador" FROM "Coordinador" WHERE "nombreCompleto" = 'Mariana López Hernández'),
-   '2026-04-15 00:00:00', '2026-10-15 00:00:00', NULL, 'Activo', '2026-04-10 09:00:00', '2026-09-17 09:00:00'),
+-- 4. EXPEDIENTES
 
-  ('PP-422234567-2026', 'Diego', 'Hernández', 'Vega', '422234567', 'diego.hernandez@comunidad.unam.mx',
-   '55 2345 6789', 22, 'H', '9no Semestre',
-   (SELECT "idPlantel" FROM "Plantel" WHERE "nombre" = 'Facultad de Ingeniería'),
-   (SELECT "idCarrera" FROM "Carrera" WHERE "nombre" = 'Ingeniería en Computación'), 'PP', 'PP-2026-031',
-   'Desarrollo de herramientas digitales para el PUIC', '2026-2', 'Sede Central PUIC (Loreto)', 'Presencial', 'Vespertino',
-   (SELECT "idCoordinador" FROM "Coordinador" WHERE "nombreCompleto" = 'Roberto Sánchez Morales'),
-   '2026-04-02 00:00:00', '2026-10-02 00:00:00', NULL, 'Activo', '2026-03-28 10:30:00', '2026-09-17 10:30:00'),
+-- Caso 1: VENCIDO (Inició en ene-2026, venció en jul-2026 y sigue Activo -> Semáforo ROJO)
+INSERT INTO Expediente (
+  idExpediente, clave, nombre, apPaterno, apMaterno, numeroCuenta, correoElectronico,
+  telefono, edad, sexo, semestre, idPlantel, idCarrera, tipoPrograma, clavePrograma,
+  nombrePrograma, cicloEscolar, ubicacionDependencia, modalidad, turno, idCoordinador,
+  fechaInicio, fechaTentativa, fechaTermino, estatus, createdAt, updatedAt
+) VALUES (
+  1, 'SS-318091234-150126', 'Rodrigo', 'Morales', 'Paredes', '318091234', 'rodrigo.morales@comunidad.unam.mx',
+  '5511223344', 23, 'H', '8vo Semestre', 1, 1, 'SS', '2026-12/45-1001',
+  'Digitalización de Acervos Lingüísticos y Étnicos', '2026-1',
+  'Sede Central PUIC (C.U. / Oficinas)', 'Presencial', 'Matutino', 1,
+  '2026-01-15T00:00:00.000Z', '2026-07-15T00:00:00.000Z', NULL, 'Activo',
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
 
-  ('SS-423345678-2026', 'Valeria', 'Santos', 'Ríos', '423345678', 'valeria.santos@comunidad.unam.mx',
-   '55 3456 7890', 20, 'M', '7mo Semestre',
-   (SELECT "idPlantel" FROM "Plantel" WHERE "nombre" = 'FES Acatlán'),
-   (SELECT "idCarrera" FROM "Carrera" WHERE "nombre" = 'Relaciones Internacionales'), 'SS', 'SS-2026-008',
-   'Vinculación comunitaria y cooperación internacional', '2026-1', 'Sede Externa (Oaxaca)', 'A Distancia', 'Mixto',
-   (SELECT "idCoordinador" FROM "Coordinador" WHERE "nombreCompleto" = 'Jorge Alberto Ramírez Soto'),
-   '2026-02-28 00:00:00', '2026-08-30 00:00:00', NULL, 'Activo', '2026-02-20 08:45:00', '2026-09-17 08:45:00'),
+-- Caso 2: PRÓXIMO A VENCER (Inició en abr-2026, vence el 1 de oct-2026 -> Semáforo AMARILLO)
+INSERT INTO Expediente (
+  idExpediente, clave, nombre, apPaterno, apMaterno, numeroCuenta, correoElectronico,
+  telefono, edad, sexo, semestre, idPlantel, idCarrera, tipoPrograma, clavePrograma,
+  nombrePrograma, cicloEscolar, ubicacionDependencia, modalidad, turno, idCoordinador,
+  fechaInicio, fechaTentativa, fechaTermino, estatus, createdAt, updatedAt
+) VALUES (
+  2, 'SS-319456789-010426', 'Valeria', 'Estrada', 'Ramos', '319456789', 'valeria.estrada@comunidad.unam.mx',
+  '5522334455', 22, 'M', '7mo Semestre', 2, 2, 'SS', '2026-12/45-1002',
+  'Investigación sobre Saberes Tradicionales e Interculturalidad', '2026-2',
+  'Sede Central PUIC (C.U. / Oficinas)', 'Mixta', 'Matutino', 2,
+  '2026-04-01T00:00:00.000Z', '2026-10-01T00:00:00.000Z', NULL, 'Activo',
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
 
-  ('PP-424456789-2026', 'Luis Fernando', 'Morales', 'Castillo', '424456789', 'luis.morales@comunidad.unam.mx',
-   '55 4567 8901', 23, 'H', 'Pasante / Egresado',
-   (SELECT "idPlantel" FROM "Plantel" WHERE "nombre" = 'Facultad de Ciencias Políticas y Sociales (FCPyS)'),
-   (SELECT "idCarrera" FROM "Carrera" WHERE "nombre" = 'Ciencias de la Comunicación'), 'PP', 'PP-2026-022',
-   'Producción de contenidos de divulgación', '2026-1', 'Sede Central PUIC (Loreto)', 'Presencial', 'Matutino',
-   (SELECT "idCoordinador" FROM "Coordinador" WHERE "nombreCompleto" = 'Elena Martínez Cruz'),
-   '2026-01-15 00:00:00', '2026-07-15 00:00:00', '2026-07-12 00:00:00', 'Terminado', '2026-01-10 11:15:00', '2026-07-12 16:00:00'),
+-- Caso 3: PRÓXIMO A VENCER EN PP (Inició en abr-2026, vence el 10 de oct-2026 -> Semáforo AMARILLO)
+INSERT INTO Expediente (
+  idExpediente, clave, nombre, apPaterno, apMaterno, numeroCuenta, correoElectronico,
+  telefono, edad, sexo, semestre, idPlantel, idCarrera, tipoPrograma, clavePrograma,
+  nombrePrograma, cicloEscolar, ubicacionDependencia, modalidad, turno, idCoordinador,
+  fechaInicio, fechaTentativa, fechaTermino, estatus, createdAt, updatedAt
+) VALUES (
+  3, 'PP-317654321-100426', 'Diego Iván', 'Navarro', 'Soto', '317654321', 'diego.navarro@comunidad.unam.mx',
+  '5533445566', 24, 'H', '9no Semestre', 3, 3, 'PP', '2026-12/45-2001',
+  'Diagnóstico Socioeconómico en Comunidades Migrantes', '2026-2',
+  'Sede Externa / En línea / Proyecto Regional', 'A Distancia', 'Vespertino', 3,
+  '2026-04-10T00:00:00.000Z', '2026-10-10T00:00:00.000Z', NULL, 'Activo',
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
 
-  ('SS-425567890-2026', 'Camila', 'Torres', 'Nava', '425567890', 'camila.torres@comunidad.unam.mx',
-   '55 5678 9012', 21, 'M', '8vo Semestre',
-   (SELECT "idPlantel" FROM "Plantel" WHERE "nombre" = 'Facultad de Psicología'),
-   (SELECT "idCarrera" FROM "Carrera" WHERE "nombre" = 'Psicología'), 'SS', 'SS-2026-019',
-   'Acompañamiento psicosocial comunitario', '2026-1', 'Sede Externa (Oaxaca)', 'Mixta', 'Matutino',
-   (SELECT "idCoordinador" FROM "Coordinador" WHERE "nombreCompleto" = 'Patricia García Torres'),
-   '2026-02-01 00:00:00', '2026-08-01 00:00:00', NULL, 'Declinado', '2026-01-25 12:00:00', '2026-03-10 12:00:00'),
+-- Caso 4: ACTIVO REGULAR (Inició en jun-2026, concluye en dic-2026 -> En tiempo)
+INSERT INTO Expediente (
+  idExpediente, clave, nombre, apPaterno, apMaterno, numeroCuenta, correoElectronico,
+  telefono, edad, sexo, semestre, idPlantel, idCarrera, tipoPrograma, clavePrograma,
+  nombrePrograma, cicloEscolar, ubicacionDependencia, modalidad, turno, idCoordinador,
+  fechaInicio, fechaTentativa, fechaTermino, estatus, createdAt, updatedAt
+) VALUES (
+  4, 'SS-420987654-010626', 'Mariana', 'López', 'Gutiérrez', '420987654', 'mariana.lg@comunidad.unam.mx',
+  '5544556677', 21, 'M', '6to Semestre', 4, 1, 'SS', '2026-12/45-1003',
+  'Desarrollo de Plataforma Web para Difusión de Proyectos Comunitarios', '2026-2',
+  'Sede Central PUIC (C.U. / Oficinas)', 'Presencial', 'Tiempo Completo / Mixto', 4,
+  '2026-06-01T00:00:00.000Z', '2026-12-01T00:00:00.000Z', NULL, 'Activo',
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
 
-  ('SS-426678901-2026', 'Emiliano', 'Cruz', 'Ortega', '426678901', 'emiliano.cruz@comunidad.unam.mx',
-   '55 6789 0123', 22, 'H', '10mo Semestre',
-   (SELECT "idPlantel" FROM "Plantel" WHERE "nombre" = 'Facultad de Medicina'),
-   (SELECT "idCarrera" FROM "Carrera" WHERE "nombre" = 'Medicina Cirujano'), 'SS', 'SS-2026-027',
-   'Promoción de la salud en comunidades indígenas', '2026-2', 'Sede Externa (Oaxaca)', 'Presencial', 'Matutino',
-   (SELECT "idCoordinador" FROM "Coordinador" WHERE "nombreCompleto" = 'Patricia García Torres'),
-   '2026-05-05 00:00:00', '2026-11-05 00:00:00', NULL, 'Activo', '2026-04-29 09:20:00', '2026-09-17 09:20:00'),
+-- Caso 5: NUEVO REGISTRO (Inició en ago-2026, termina en feb-2027)
+INSERT INTO Expediente (
+  idExpediente, clave, nombre, apPaterno, apMaterno, numeroCuenta, correoElectronico,
+  telefono, edad, sexo, semestre, idPlantel, idCarrera, tipoPrograma, clavePrograma,
+  nombrePrograma, cicloEscolar, ubicacionDependencia, modalidad, turno, idCoordinador,
+  fechaInicio, fechaTentativa, fechaTermino, estatus, createdAt, updatedAt
+) VALUES (
+  5, 'PP-318332211-150826', 'Carlos Alberto', 'Ríos', 'Castillo', '318332211', 'carlos.rios@comunidad.unam.mx',
+  '5555667788', 23, 'H', '8vo Semestre', 5, 5, 'PP', '2026-12/45-2002',
+  'Intervención Social en Espacios Multiculturales', '2027-1',
+  'Sede Central PUIC (C.U. / Oficinas)', 'Presencial', 'Matutino', 3,
+  '2026-08-15T00:00:00.000Z', '2027-02-15T00:00:00.000Z', NULL, 'Activo',
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
 
-  ('PP-427789012-2026', 'Ximena', 'Luna', 'Pérez', '427789012', 'ximena.luna@comunidad.unam.mx',
-   '55 7890 1234', 20, 'M', '7mo Semestre',
-   (SELECT "idPlantel" FROM "Plantel" WHERE "nombre" = 'FES Zaragoza'),
-   (SELECT "idCarrera" FROM "Carrera" WHERE "nombre" = 'Derecho'), 'PP', 'PP-2026-041',
-   'Asesoría jurídica y gestión de derechos culturales', '2026-1', 'Sede Central PUIC (Loreto)', 'A Distancia', 'Vespertino',
-   (SELECT "idCoordinador" FROM "Coordinador" WHERE "nombreCompleto" = 'Elena Martínez Cruz'),
-   '2026-03-20 00:00:00', '2026-09-20 00:00:00', NULL, 'Activo', '2026-03-15 14:00:00', '2026-09-17 14:00:00'),
+-- Caso 6: CONCLUIDO / TERMINADO (Liberado satisfactoriamente)
+INSERT INTO Expediente (
+  idExpediente, clave, nombre, apPaterno, apMaterno, numeroCuenta, correoElectronico,
+  telefono, edad, sexo, semestre, idPlantel, idCarrera, tipoPrograma, clavePrograma,
+  nombrePrograma, cicloEscolar, ubicacionDependencia, modalidad, turno, idCoordinador,
+  fechaInicio, fechaTentativa, fechaTermino, estatus, createdAt, updatedAt
+) VALUES (
+  6, 'SS-316112233-150126', 'Fernanda', 'Castillo', 'Molina', '316112233', 'fer.castillo@comunidad.unam.mx',
+  '5566778899', 24, 'M', 'Pasante / Egresado', 1, 4, 'SS', '2026-12/45-1001',
+  'Asesoría Jurídica en Derechos Colectivos de Pueblos Indígenas', '2026-1',
+  'Sede Central PUIC (C.U. / Oficinas)', 'Mixta', 'Vespertino', 1,
+  '2026-01-15T00:00:00.000Z', '2026-07-15T00:00:00.000Z', '2026-07-20T00:00:00.000Z', 'Terminado',
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
 
-  ('SS-428890123-2026', 'Santiago', 'Vargas', 'León', '428890123', 'santiago.vargas@comunidad.unam.mx',
-   '55 8901 2345', 22, 'H', 'Pasante / Egresado',
-   (SELECT "idPlantel" FROM "Plantel" WHERE "nombre" = 'Facultad de Ciencias'),
-   (SELECT "idCarrera" FROM "Carrera" WHERE "nombre" = 'Actuaría'), 'SS', 'SS-2026-011',
-   'Estadística aplicada a estudios humanísticos', '2026-1', 'Sede Central PUIC (Loreto)', 'A Distancia', 'Mixto',
-   (SELECT "idCoordinador" FROM "Coordinador" WHERE "nombreCompleto" = 'Mariana López Hernández'),
-   '2026-01-10 00:00:00', '2026-07-10 00:00:00', '2026-07-08 00:00:00', 'Terminado', '2026-01-06 08:00:00', '2026-07-08 15:30:00'),
+-- Caso 7: CONCLUIDO / TERMINADO (Liberado satisfactoriamente)
+INSERT INTO Expediente (
+  idExpediente, clave, nombre, apPaterno, apMaterno, numeroCuenta, correoElectronico,
+  telefono, edad, sexo, semestre, idPlantel, idCarrera, tipoPrograma, clavePrograma,
+  nombrePrograma, cicloEscolar, ubicacionDependencia, modalidad, turno, idCoordinador,
+  fechaInicio, fechaTentativa, fechaTermino, estatus, createdAt, updatedAt
+) VALUES (
+  7, 'PP-317889900-010226', 'Alejandro', 'Cruz', 'Ortiz', '317889900', 'alejandro.cruz@comunidad.unam.mx',
+  '5577889900', 25, 'H', '10mo Semestre', 1, 6, 'PP', '2026-12/45-2003',
+  'Identidad Gráfica y Campañas Audiovisuales PUIC', '2026-1',
+  'Sede Externa / En línea / Proyecto Regional', 'A Distancia', 'Vespertino', 2,
+  '2026-02-01T00:00:00.000Z', '2026-08-01T00:00:00.000Z', '2026-08-05T00:00:00.000Z', 'Terminado',
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
 
-  ('PP-429901234-2026', 'Renata', 'Flores', 'Salas', '429901234', 'renata.flores@comunidad.unam.mx',
-   '55 9012 3456', 21, 'M', '8vo Semestre',
-   (SELECT "idPlantel" FROM "Plantel" WHERE "nombre" = 'FES Acatlán'),
-   (SELECT "idCarrera" FROM "Carrera" WHERE "nombre" = 'Ciencia de Datos'), 'PP', 'PP-2026-052',
-   'Visualización de datos para observatorios culturales', '2027-1', 'Sede Central PUIC (Loreto)', 'Mixta', 'Matutino',
-   (SELECT "idCoordinador" FROM "Coordinador" WHERE "nombreCompleto" = 'Roberto Sánchez Morales'),
-   '2026-11-15 00:00:00', '2027-05-15 00:00:00', NULL, 'Activo', '2026-09-10 10:00:00', '2026-09-17 10:00:00'),
+-- Caso 8: DECLINADO / BAJA (Alumno que causó baja por motivos laborales)
+INSERT INTO Expediente (
+  idExpediente, clave, nombre, apPaterno, apMaterno, numeroCuenta, correoElectronico,
+  telefono, edad, sexo, semestre, idPlantel, idCarrera, tipoPrograma, clavePrograma,
+  nombrePrograma, cicloEscolar, ubicacionDependencia, modalidad, turno, idCoordinador,
+  fechaInicio, fechaTentativa, fechaTermino, estatus, createdAt, updatedAt
+) VALUES (
+  8, 'SS-319998877-010326', 'Sebastián', 'Fuentes', 'Vega', '319998877', 's.fuentes@comunidad.unam.mx',
+  '5588990011', 22, 'H', '7mo Semestre', 3, 3, 'SS', '2026-12/45-1002',
+  'Sistematización de Datos Etnográficos', '2026-1',
+  'Sede Central PUIC (C.U. / Oficinas)', 'Presencial', 'Matutino', 1,
+  '2026-03-01T00:00:00.000Z', '2026-09-01T00:00:00.000Z', NULL, 'Declinado',
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
 
-  ('SS-430012345-2026', 'Mateo', 'Ramírez', 'Ibarra', '430012345', 'mateo.ramirez@comunidad.unam.mx',
-   '55 0123 4567', 20, 'H', '6to Semestre',
-   (SELECT "idPlantel" FROM "Plantel" WHERE "nombre" = 'Facultad de Ingeniería'),
-   (SELECT "idCarrera" FROM "Carrera" WHERE "nombre" = 'Ingeniería en Computación'), 'SS', 'SS-2026-033',
-   'Mantenimiento de acervos digitales', '2026-2', 'Sede Central PUIC (Loreto)', 'Presencial', 'Vespertino',
-   (SELECT "idCoordinador" FROM "Coordinador" WHERE "nombreCompleto" = 'Jorge Alberto Ramírez Soto'),
-   '2026-04-10 00:00:00', '2026-10-10 00:00:00', NULL, 'Declinado', '2026-04-05 09:45:00', '2026-05-02 11:00:00'),
+-- 5. SEGUIMIENTO DOCUMENTAL DE CADA EXPEDIENTE
 
-  ('SS-431123450-2026', 'Sofía', 'Navarro', 'Delgado', '431123450', 'sofia.navarro@comunidad.unam.mx',
-   '55 1122 3344', 23, 'O', '9no Semestre',
-   (SELECT "idPlantel" FROM "Plantel" WHERE "nombre" = 'Facultad de Ciencias Políticas y Sociales (FCPyS)'),
-   (SELECT "idCarrera" FROM "Carrera" WHERE "nombre" = 'Relaciones Internacionales'), 'SS', 'SS-2026-039',
-   'Investigación sobre patrimonio cultural inmaterial', '2026-2', 'Sede Externa (Oaxaca)', 'A Distancia', 'Mixto',
-   (SELECT "idCoordinador" FROM "Coordinador" WHERE "nombreCompleto" = 'Mariana López Hernández'),
-   '2026-05-18 00:00:00', '2026-11-18 00:00:00', NULL, 'Activo', '2026-05-12 13:30:00', '2026-09-17 13:30:00'),
+-- Exp 1: Tiene aceptación pero debe informe final y término
+INSERT INTO SeguimientoDocumental (idExpediente, cartaAceptacion, informeFinalUrl, cartaTermino, createdAt, updatedAt)
+VALUES (1, 1, NULL, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-  ('PP-432234561-2026', 'Carlos Eduardo', 'Mejía', 'Romero', '432234561', 'carlos.mejia@comunidad.unam.mx',
-   '55 2233 4455', 24, 'H', 'Pasante / Egresado',
-   (SELECT "idPlantel" FROM "Plantel" WHERE "nombre" = 'FES Zaragoza'),
-   (SELECT "idCarrera" FROM "Carrera" WHERE "nombre" = 'Psicología'), 'PP', 'PP-2026-016',
-   'Evaluación de programas de intervención social', '2026-1', 'Sede Externa (Oaxaca)', 'Mixta', 'Vespertino',
-   (SELECT "idCoordinador" FROM "Coordinador" WHERE "nombreCompleto" = 'Patricia García Torres'),
-   '2026-01-22 00:00:00', '2026-07-22 00:00:00', '2026-07-20 00:00:00', 'Terminado', '2026-01-18 12:15:00', '2026-07-20 17:00:00');
+-- Exp 2: En espera de entrega de informe final
+INSERT INTO SeguimientoDocumental (idExpediente, cartaAceptacion, informeFinalUrl, cartaTermino, createdAt, updatedAt)
+VALUES (2, 1, NULL, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-INSERT OR IGNORE INTO "SeguimientoDocumental" (
-  "idExpediente", "preRegistro", "registro", "cartaAceptacion", "informeFinalUrl", "cartaTermino",
-  "declinacionObs", "createdAt", "updatedAt"
-) VALUES
-  ((SELECT "idExpediente" FROM "Expediente" WHERE "clave" = 'SS-421123456-2026'), '2026-04-01 00:00:00', '2026-04-10 00:00:00', 1, NULL, 0, NULL, '2026-04-10 09:00:00', '2026-09-17 09:00:00'),
-  ((SELECT "idExpediente" FROM "Expediente" WHERE "clave" = 'PP-422234567-2026'), '2026-03-20 00:00:00', '2026-03-28 00:00:00', 1, NULL, 0, NULL, '2026-03-28 10:30:00', '2026-09-17 10:30:00'),
-  ((SELECT "idExpediente" FROM "Expediente" WHERE "clave" = 'SS-423345678-2026'), '2026-02-14 00:00:00', '2026-02-20 00:00:00', 0, NULL, 0, 'Pendiente de regularizar documentación.', '2026-02-20 08:45:00', '2026-09-17 08:45:00'),
-  ((SELECT "idExpediente" FROM "Expediente" WHERE "clave" = 'PP-424456789-2026'), '2026-01-04 00:00:00', '2026-01-10 00:00:00', 1, '/documentos/informe-luis-morales.pdf', 1, NULL, '2026-01-10 11:15:00', '2026-07-12 16:00:00'),
-  ((SELECT "idExpediente" FROM "Expediente" WHERE "clave" = 'SS-425567890-2026'), '2026-01-18 00:00:00', '2026-01-25 00:00:00', 1, NULL, 0, 'Cambio de residencia fuera de la sede asignada.', '2026-01-25 12:00:00', '2026-03-10 12:00:00'),
-  ((SELECT "idExpediente" FROM "Expediente" WHERE "clave" = 'SS-426678901-2026'), '2026-04-20 00:00:00', '2026-04-29 00:00:00', 1, NULL, 0, NULL, '2026-04-29 09:20:00', '2026-09-17 09:20:00'),
-  ((SELECT "idExpediente" FROM "Expediente" WHERE "clave" = 'PP-427789012-2026'), '2026-03-08 00:00:00', '2026-03-15 00:00:00', 0, NULL, 0, NULL, '2026-03-15 14:00:00', '2026-09-17 14:00:00'),
-  ((SELECT "idExpediente" FROM "Expediente" WHERE "clave" = 'SS-428890123-2026'), '2026-01-02 00:00:00', '2026-01-06 00:00:00', 1, '/documentos/informe-santiago-vargas.pdf', 1, NULL, '2026-01-06 08:00:00', '2026-07-08 15:30:00'),
-  ((SELECT "idExpediente" FROM "Expediente" WHERE "clave" = 'PP-429901234-2026'), '2026-09-03 00:00:00', '2026-09-10 00:00:00', 1, NULL, 0, NULL, '2026-09-10 10:00:00', '2026-09-17 10:00:00'),
-  ((SELECT "idExpediente" FROM "Expediente" WHERE "clave" = 'SS-430012345-2026'), '2026-03-29 00:00:00', '2026-04-05 00:00:00', 0, NULL, 0, 'Incompatibilidad de horario con materias obligatorias.', '2026-04-05 09:45:00', '2026-05-02 11:00:00'),
-  ((SELECT "idExpediente" FROM "Expediente" WHERE "clave" = 'SS-431123450-2026'), '2026-05-04 00:00:00', '2026-05-12 00:00:00', 1, NULL, 0, NULL, '2026-05-12 13:30:00', '2026-09-17 13:30:00'),
-  ((SELECT "idExpediente" FROM "Expediente" WHERE "clave" = 'PP-432234561-2026'), '2026-01-12 00:00:00', '2026-01-18 00:00:00', 1, '/documentos/informe-carlos-mejia.pdf', 1, NULL, '2026-01-18 12:15:00', '2026-07-20 17:00:00');
+-- Exp 3: Entregó informe final en Drive, falta validación de carta término
+INSERT INTO SeguimientoDocumental (idExpediente, cartaAceptacion, informeFinalUrl, cartaTermino, createdAt, updatedAt)
+VALUES (3, 1, 'https://drive.google.com/file/d/ejemplo-informe-diego-navarro/view', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-COMMIT;
+-- Exp 4: Trámite reciente, solo carta de aceptación
+INSERT INTO SeguimientoDocumental (idExpediente, cartaAceptacion, informeFinalUrl, cartaTermino, createdAt, updatedAt)
+VALUES (4, 1, NULL, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Exp 5: Nuevo ingreso, sin documentos
+INSERT INTO SeguimientoDocumental (idExpediente, cartaAceptacion, informeFinalUrl, cartaTermino, createdAt, updatedAt)
+VALUES (5, 0, NULL, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Exp 6: Liberado completo (Aceptación, Informe y Término)
+INSERT INTO SeguimientoDocumental (idExpediente, cartaAceptacion, informeFinalUrl, cartaTermino, createdAt, updatedAt)
+VALUES (6, 1, 'https://drive.google.com/file/d/informe-final-fernanda-castillo/view', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Exp 7: Liberado completo
+INSERT INTO SeguimientoDocumental (idExpediente, cartaAceptacion, informeFinalUrl, cartaTermino, createdAt, updatedAt)
+VALUES (7, 1, 'https://drive.google.com/file/d/informe-final-alejandro-cruz/view', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Exp 8: Declinado con justificación
+INSERT INTO SeguimientoDocumental (idExpediente, cartaAceptacion, informeFinalUrl, cartaTermino, declinacionObs, createdAt, updatedAt)
+VALUES (8, 1, NULL, 0, 'Baja voluntaria notificada el 15/05/2026 por cruce de horarios laborales en su nuevo empleo.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

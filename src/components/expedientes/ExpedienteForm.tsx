@@ -95,55 +95,55 @@ export default function ExpedienteForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm space-y-8">
+    <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-2xl border border-[#E2DACB] shadow-xs space-y-8">
       
       {/* SECCIÓN 1: DATOS DEL ALUMNO Y CONTACTO */}
       <div>
-        <div className="border-b border-slate-200 pb-2 mb-4">
-          <h3 className="text-base font-bold text-[#0A1E42] flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-[#002B7A] text-white text-xs flex items-center justify-center font-bold">1</span>
+        <div className="border-b border-[#E2DACB] pb-2 mb-4">
+          <h3 className="font-serif text-lg font-bold text-[#0A1E42] flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-[#0A1E42] text-white text-xs flex items-center justify-center font-bold">1</span>
             Datos Personales y de Contacto
           </h3>
-          <p className="text-xs text-slate-500 ml-8">Información de identificación del prestador o practicante.</p>
+          <p className="text-xs font-serif italic text-[#5C6779] ml-8">Información de identificación del prestador o practicante.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Nombre(s) *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Nombre(s) *</label>
             <input
               required
               type="text"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               placeholder="Ej. Juan Carlos"
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Apellido Paterno *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Apellido Paterno *</label>
             <input
               required
               type="text"
               value={apPaterno}
               onChange={(e) => setApPaterno(e.target.value)}
               placeholder="Ej. Pérez"
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Apellido Materno *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Apellido Materno *</label>
             <input
               required
               type="text"
               value={apMaterno}
               onChange={(e) => setApMaterno(e.target.value)}
               placeholder="Ej. López"
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Número de Cuenta (9 dígitos) *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Número de Cuenta (9 dígitos) *</label>
             <input
               required
               type="text"
@@ -151,34 +151,34 @@ export default function ExpedienteForm() {
               value={numeroCuenta}
               onChange={(e) => setNumeroCuenta(e.target.value.replace(/\D/g, ''))}
               placeholder="318123456"
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none font-mono font-semibold"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none font-mono font-semibold transition-all"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Correo Electrónico *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Correo Electrónico *</label>
             <input
               required
               type="email"
               value={correoElectronico}
               onChange={(e) => setCorreoElectronico(e.target.value)}
               placeholder="alumno@comunidad.unam.mx"
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Teléfono de Contacto *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Teléfono de Contacto *</label>
             <input
               required
               type="tel"
               value={telefono}
               onChange={(e) => setTelefono(e.target.value)}
               placeholder="55 1234 5678"
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Edad *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Edad *</label>
             <input
               required
               type="number"
@@ -187,15 +187,15 @@ export default function ExpedienteForm() {
               value={edad}
               onChange={(e) => setEdad(e.target.value === '' ? '' : Number(e.target.value))}
               placeholder="Ej. 22"
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Sexo *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Sexo *</label>
             <select
               value={sexo}
               onChange={(e) => setSexo(e.target.value)}
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             >
               <option value="H">Hombre</option>
               <option value="M">Mujer</option>
@@ -203,11 +203,11 @@ export default function ExpedienteForm() {
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Semestre Cursando *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Semestre Cursando *</label>
             <select
               value={semestre}
               onChange={(e) => setSemestre(e.target.value)}
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             >
               {SEMESTRES_UNAM.map((sem) => (
                 <option key={sem} value={sem}>{sem}</option>
@@ -219,21 +219,21 @@ export default function ExpedienteForm() {
 
       {/* SECCIÓN 2: ADSCRIPCIÓN ACADÉMICA */}
       <div>
-        <div className="border-b border-slate-200 pb-2 mb-4">
-          <h3 className="text-base font-bold text-[#0A1E42] flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-[#002B7A] text-white text-xs flex items-center justify-center font-bold">2</span>
+        <div className="border-b border-[#E2DACB] pb-2 mb-4">
+          <h3 className="font-serif text-lg font-bold text-[#0A1E42] flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-[#0A1E42] text-white text-xs flex items-center justify-center font-bold">2</span>
             Adscripción Académica UNAM
           </h3>
-          <p className="text-xs text-slate-500 ml-8">Plantel y carrera de procedencia del alumno.</p>
+          <p className="text-xs font-serif italic text-[#5C6779] ml-8">Plantel y carrera de procedencia del alumno.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Facultad o Escuela (Plantel) *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Facultad o Escuela (Plantel) *</label>
             <select
               value={plantelNombre}
               onChange={(e) => setPlantelNombre(e.target.value)}
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             >
               {PLANTELES_UNAM.map((plantel) => (
                 <option key={plantel} value={plantel}>{plantel}</option>
@@ -241,11 +241,11 @@ export default function ExpedienteForm() {
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Carrera *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Carrera *</label>
             <select
               value={carreraNombre}
               onChange={(e) => setCarreraNombre(e.target.value)}
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             >
               {CARRERAS_UNAM.map((carrera) => (
                 <option key={carrera} value={carrera}>{carrera}</option>
@@ -257,43 +257,43 @@ export default function ExpedienteForm() {
 
       {/* SECCIÓN 3: PROGRAMA INSTITUCIONAL */}
       <div>
-        <div className="border-b border-slate-200 pb-2 mb-4">
-          <h3 className="text-base font-bold text-[#0A1E42] flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-[#002B7A] text-white text-xs flex items-center justify-center font-bold">3</span>
+        <div className="border-b border-[#E2DACB] pb-2 mb-4">
+          <h3 className="font-serif text-lg font-bold text-[#0A1E42] flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-[#0A1E42] text-white text-xs flex items-center justify-center font-bold">3</span>
             Datos del Programa Institucional
           </h3>
-          <p className="text-xs text-slate-500 ml-8">Registro oficial ante DGOAE / SIASS y características operativas.</p>
+          <p className="text-xs font-serif italic text-[#5C6779] ml-8">Registro oficial ante DGOAE / SIASS y características operativas.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Tipo de Programa *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Tipo de Programa *</label>
             <select
               value={tipoPrograma}
               onChange={(e) => setTipoPrograma(e.target.value as 'SS' | 'PP')}
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none font-semibold text-[#002B7A]"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none font-semibold text-[#0A1E42] transition-all"
             >
               <option value="SS">Servicio Social (SS)</option>
               <option value="PP">Prácticas Profesionales (PP)</option>
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Clave del Programa *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Clave de Programa (SIASS/DGOAE) *</label>
             <input
               required
               type="text"
               value={clavePrograma}
               onChange={(e) => setClavePrograma(e.target.value)}
               placeholder="Ej. 2026-12/45-1234"
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none font-mono"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all font-mono"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Ciclo Escolar *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Ciclo Escolar *</label>
             <select
               value={cicloEscolar}
               onChange={(e) => setCicloEscolar(e.target.value)}
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             >
               {CICLOS_ESCOLARES.map((ciclo) => (
                 <option key={ciclo} value={ciclo}>{ciclo}</option>
@@ -301,51 +301,51 @@ export default function ExpedienteForm() {
             </select>
           </div>
 
-          <div className="space-y-1 md:col-span-3">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Nombre del Programa / Proyecto *</label>
+          <div className="md:col-span-3 space-y-1">
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Nombre del Programa / Proyecto Asignado *</label>
             <input
               required
               type="text"
               value={nombrePrograma}
               onChange={(e) => setNombrePrograma(e.target.value)}
-              placeholder="Ej. Apoyo en Investigación Intercultural y Difusión Comunitaria"
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              placeholder="Ej. Archivo y Preservación de Lenguas Indígenas Nacionales"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Ubicación de la Dependencia *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Ubicación de la Dependencia *</label>
             <select
               value={ubicacionDependencia}
               onChange={(e) => setUbicacionDependencia(e.target.value)}
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             >
-              {UBICACIONES_DEPENDENCIA.map((ubi) => (
-                <option key={ubi} value={ubi}>{ubi}</option>
+              {UBICACIONES_DEPENDENCIA.map((u) => (
+                <option key={u} value={u}>{u}</option>
               ))}
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Modalidad *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Modalidad *</label>
             <select
               value={modalidad}
               onChange={(e) => setModalidad(e.target.value)}
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             >
-              {MODALIDADES.map((mod) => (
-                <option key={mod} value={mod}>{mod}</option>
+              {MODALIDADES.map((m) => (
+                <option key={m} value={m}>{m}</option>
               ))}
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Turno *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Turno Asignado *</label>
             <select
               value={turno}
               onChange={(e) => setTurno(e.target.value)}
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             >
-              {TURNOS.map((tur) => (
-                <option key={tur} value={tur}>{tur}</option>
+              {TURNOS.map((t) => (
+                <option key={t} value={t}>{t}</option>
               ))}
             </select>
           </div>
@@ -354,90 +354,90 @@ export default function ExpedienteForm() {
 
       {/* SECCIÓN 4: COORDINADOR / RESPONSABLE */}
       <div>
-        <div className="border-b border-slate-200 pb-2 mb-4">
-          <h3 className="text-base font-bold text-[#0A1E42] flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-[#002B7A] text-white text-xs flex items-center justify-center font-bold">4</span>
-            Responsable / Coordinador del Programa
+        <div className="border-b border-[#E2DACB] pb-2 mb-4">
+          <h3 className="font-serif text-lg font-bold text-[#0A1E42] flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-[#0A1E42] text-white text-xs flex items-center justify-center font-bold">4</span>
+            Responsable Directo / Coordinador PUIC
           </h3>
-          <p className="text-xs text-slate-500 ml-8">Titular o asesor directo asignado al alumno.</p>
+          <p className="text-xs font-serif italic text-[#5C6779] ml-8">Académico o funcionario que supervisará las actividades.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="space-y-1 md:col-span-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Grado Académico *</label>
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Grado Académico *</label>
             <select
               value={coordinadorGrado}
               onChange={(e) => setCoordinadorGrado(e.target.value)}
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none font-medium"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             >
-              {GRADOS_ACADEMICOS.map((grado) => (
-                <option key={grado} value={grado}>{grado}</option>
+              {GRADOS_ACADEMICOS.map((g) => (
+                <option key={g} value={g}>{g}</option>
               ))}
             </select>
           </div>
-          <div className="space-y-1 md:col-span-3">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Nombre Completo del Responsable *</label>
+          <div className="md:col-span-3 space-y-1">
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Nombre Completo del Coordinador *</label>
             <input
               required
               type="text"
               value={coordinadorNombre}
               onChange={(e) => setCoordinadorNombre(e.target.value)}
               placeholder="Ej. Roberto Sánchez Morales"
-              className="w-full p-2.5 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             />
           </div>
         </div>
       </div>
 
       {/* SECCIÓN 5: TIEMPOS Y CLAVE INSTITUCIONAL */}
-      <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-        <div className="border-b border-slate-200 pb-2 mb-4">
-          <h3 className="text-base font-bold text-[#0A1E42] flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-[#D59F0F] text-[#0A1E42] text-xs flex items-center justify-center font-bold">5</span>
+      <div className="bg-[#FBF9F5] p-6 rounded-2xl border border-[#E2DACB]">
+        <div className="border-b border-[#E2DACB] pb-2 mb-4">
+          <h3 className="font-serif text-lg font-bold text-[#0A1E42] flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-[#C68A2C] text-white text-xs flex items-center justify-center font-bold">5</span>
             Tiempos Oficiales y Clave Única
           </h3>
-          <p className="text-xs text-slate-500 ml-8">Cálculo normativo de 6 meses y generación de identificador.</p>
+          <p className="text-xs font-serif italic text-[#5C6779] ml-8">Cálculo normativo de 6 meses y generación automática de identificador institucional.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Fecha de Inicio Oficial *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Fecha de Inicio Oficial *</label>
             <input
               required
               type="date"
               value={fechaInicio}
               onChange={(e) => setFechaInicio(e.target.value)}
-              className="w-full p-2.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#002B7A] outline-none"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-white focus:ring-2 focus:ring-[#C68A2C] outline-none transition-all"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700 uppercase">Fecha Tentativa (+6 Meses)</label>
+            <label className="text-xs font-bold text-[#5C6779] uppercase">Fecha Tentativa (+6 Meses)</label>
             <input
               readOnly
               type="date"
               value={fechaTentativa}
-              className="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-slate-100 text-slate-600 font-medium cursor-not-allowed"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-slate-100 text-slate-600 font-medium cursor-not-allowed"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-[#002B7A] uppercase">Clave Única Institucional</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Clave Única Institucional</label>
             <input
               readOnly
               type="text"
               value={clave}
               placeholder="Automático (SS/PP-Cuenta-Fecha)"
-              className="w-full p-2.5 border border-[#D59F0F] rounded-lg text-sm bg-amber-50 text-[#0A1E42] font-mono font-bold cursor-not-allowed"
+              className="w-full p-2.5 border border-[#C68A2C] rounded-xl text-sm bg-[#C68A2C]/10 text-[#0A1E42] font-mono font-bold cursor-not-allowed"
             />
           </div>
         </div>
       </div>
 
       {/* BOTÓN DE ACCIÓN */}
-      <div className="flex justify-end pt-4 border-t border-slate-200">
+      <div className="flex justify-end pt-4 border-t border-[#E2DACB]">
         <button
           type="submit"
           disabled={isPending}
-          className="bg-[#002B7A] hover:bg-[#0A1E42] text-white font-semibold py-3 px-8 rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-[#0A1E42] hover:bg-[#06132A] text-white font-serif font-bold py-3 px-8 rounded-xl border-b-2 border-[#C68A2C] shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {isPending ? 'Guardando Expediente...' : 'Guardar y Registrar Expediente'}
         </button>
