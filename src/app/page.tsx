@@ -14,6 +14,7 @@ import {
   PlusCircle,
   ExternalLink,
   Award,
+  Globe,
 } from 'lucide-react';
 
 export default async function DashboardPage() {
@@ -29,15 +30,15 @@ export default async function DashboardPage() {
             <span className="px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#0A1E42] text-white tracking-wider uppercase">
               PUIC - UNAM
             </span>
-            <span className="inline-flex items-center gap-1 text-[11px] font-serif font-bold text-[#9E6B1D] bg-[#C68A2C]/15 px-2 py-0.5 rounded border border-[#C68A2C]/30">
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#9E6B1D] bg-[#C68A2C]/15 px-2 py-0.5 rounded border border-[#C68A2C]/30">
               <Award size={12} /> 475 Aniversario
             </span>
             <span className="text-xs text-[#5C6779] font-medium hidden sm:inline">• Ciclo Operativo Activo</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#0A1E42] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0A1E42] tracking-tight">
             Panel de Inteligencia Operativa
           </h1>
-          <p className="text-xs sm:text-sm font-serif italic text-[#5C6779] mt-0.5">
+          <p className="text-xs sm:text-sm italic text-[#5C6779] mt-0.5">
             La UNAM y la pluriculturalidad: seguimiento integral de Servicio Social y Prácticas.
           </p>
         </div>
@@ -64,24 +65,24 @@ export default async function DashboardPage() {
           <span>Métricas del Padrón Universitario</span>
           <span className="text-slate-400 font-normal normal-case text-xs">(Haz clic para filtrar)</span>
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           
           {/* Card 1: Activos Totales */}
           <Link
             href="/expedientes?estatus=Activo"
-            className="group bg-white p-5 rounded-2xl border border-[#E2DACB] hover:border-[#0A1E42] hover:shadow-md transition-all relative overflow-hidden"
+            className="group bg-white p-5 rounded-2xl border border-[#E2DACB] hover:border-[#0A1E42] hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between"
           >
             <div className="flex justify-between items-start">
               <div>
                 <span className="text-xs font-bold text-[#5C6779] uppercase tracking-wider">
                   Alumnos Activos
                 </span>
-                <p className="text-3xl font-serif font-black text-[#0A1E42] mt-1 group-hover:text-[#163670] transition-colors">
+                <p className="text-3xl font-black text-[#0A1E42] mt-1 group-hover:text-[#163670] transition-colors">
                   {data.totalActivos}
                 </p>
               </div>
               <div className="p-2.5 bg-[#0A1E42]/10 text-[#0A1E42] rounded-xl group-hover:bg-[#0A1E42] group-hover:text-white transition-colors">
-                <Users size={22} />
+                <Users size={20} />
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between text-xs text-[#5C6779] group-hover:text-[#0A1E42]">
@@ -93,23 +94,23 @@ export default async function DashboardPage() {
           {/* Card 2: Servicio Social */}
           <Link
             href="/expedientes?programa=SS&estatus=Activo"
-            className="group bg-white p-5 rounded-2xl border border-[#E2DACB] hover:border-[#008A7C] hover:shadow-md transition-all relative overflow-hidden"
+            className="group bg-white p-5 rounded-2xl border border-[#E2DACB] hover:border-[#008A7C] hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between"
           >
             <div className="flex justify-between items-start">
               <div>
                 <span className="text-xs font-bold text-[#5C6779] uppercase tracking-wider">
                   Servicio Social (SS)
                 </span>
-                <p className="text-3xl font-serif font-black text-[#008A7C] mt-1">
+                <p className="text-3xl font-black text-[#008A7C] mt-1">
                   {data.totalSS}
                 </p>
               </div>
               <div className="p-2.5 bg-[#008A7C]/10 text-[#008A7C] rounded-xl group-hover:bg-[#008A7C] group-hover:text-white transition-colors">
-                <GraduationCap size={22} />
+                <GraduationCap size={20} />
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between text-xs text-[#5C6779] group-hover:text-[#008A7C]">
-              <span className="font-medium">{Math.round((data.totalSS / (data.totalActivos || 1)) * 100)}% del padrón activo</span>
+              <span className="font-medium">{Math.round((data.totalSS / (data.totalActivos || 1)) * 100)}% de activos</span>
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-[#008A7C]" />
             </div>
           </Link>
@@ -117,31 +118,58 @@ export default async function DashboardPage() {
           {/* Card 3: Prácticas Profesionales */}
           <Link
             href="/expedientes?programa=PP&estatus=Activo"
-            className="group bg-white p-5 rounded-2xl border border-[#E2DACB] hover:border-[#C68A2C] hover:shadow-md transition-all relative overflow-hidden"
+            className="group bg-white p-5 rounded-2xl border border-[#E2DACB] hover:border-[#C68A2C] hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between"
           >
             <div className="flex justify-between items-start">
               <div>
                 <span className="text-xs font-bold text-[#5C6779] uppercase tracking-wider">
                   Prácticas (PP)
                 </span>
-                <p className="text-3xl font-serif font-black text-[#C68A2C] mt-1">
+                <p className="text-3xl font-black text-[#C68A2C] mt-1">
                   {data.totalPP}
                 </p>
               </div>
               <div className="p-2.5 bg-[#C68A2C]/15 text-[#9E6B1D] rounded-xl group-hover:bg-[#C68A2C] group-hover:text-white transition-colors">
-                <Briefcase size={22} />
+                <Briefcase size={20} />
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between text-xs text-[#5C6779] group-hover:text-[#9E6B1D]">
-              <span className="font-medium">{Math.round((data.totalPP / (data.totalActivos || 1)) * 100)}% del padrón activo</span>
+              <span className="font-medium">{Math.round((data.totalPP / (data.totalActivos || 1)) * 100)}% de activos</span>
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-[#C68A2C]" />
             </div>
           </Link>
 
-          {/* Card 4: Concluidos / Eficiencia Terminal */}
+          {/* Card 4: Escuelas Externas (No UNAM) */}
+          <Link
+            href="/expedientes?origen=EXTERNA"
+            className="group bg-white p-5 rounded-2xl border border-[#E2DACB] hover:border-[#008A7C] hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between"
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="text-xs font-bold text-[#008A7C] uppercase tracking-wider flex items-center gap-1">
+                  Escuelas Externas
+                </span>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <p className="text-3xl font-black text-[#008A7C]">{data.totalExternos}</p>
+                  <span className="text-xs font-semibold text-slate-500">
+                    ({data.activosExternos} activos)
+                  </span>
+                </div>
+              </div>
+              <div className="p-2.5 bg-[#008A7C]/10 text-[#008A7C] rounded-xl group-hover:bg-[#008A7C] group-hover:text-white transition-colors">
+                <Globe size={20} />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center justify-between text-xs text-[#5C6779] group-hover:text-[#008A7C]">
+              <span className="font-medium">{data.totalPlantelesExternos} planteles externos</span>
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-[#008A7C]" />
+            </div>
+          </Link>
+
+          {/* Card 5: Concluidos / Eficiencia Terminal */}
           <Link
             href="/expedientes?estatus=Terminado"
-            className="group bg-white p-5 rounded-2xl border border-[#E2DACB] hover:border-[#0A1E42] hover:shadow-md transition-all relative overflow-hidden"
+            className="group bg-white p-5 rounded-2xl border border-[#E2DACB] hover:border-[#0A1E42] hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between"
           >
             <div className="flex justify-between items-start">
               <div>
@@ -149,18 +177,18 @@ export default async function DashboardPage() {
                   Acreditados
                 </span>
                 <div className="flex items-baseline gap-2 mt-1">
-                  <p className="text-3xl font-serif font-black text-[#0A1E42]">{data.totalTerminados}</p>
+                  <p className="text-3xl font-black text-[#0A1E42]">{data.totalTerminados}</p>
                   <span className="text-xs font-bold text-[#008A7C] flex items-center gap-0.5">
-                    <TrendingUp size={12} /> {data.tasaExito}% éxito
+                    <TrendingUp size={12} /> {data.tasaExito}%
                   </span>
                 </div>
               </div>
               <div className="p-2.5 bg-[#0A1E42]/10 text-[#0A1E42] rounded-xl group-hover:bg-[#0A1E42] group-hover:text-white transition-colors">
-                <CheckCircle2 size={22} />
+                <CheckCircle2 size={20} />
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between text-xs text-[#5C6779] group-hover:text-[#0A1E42]">
-              <span className="font-medium">Ver concluidos y constancias</span>
+              <span className="font-medium">Ver concluidos</span>
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-[#C68A2C]" />
             </div>
           </Link>
@@ -173,7 +201,7 @@ export default async function DashboardPage() {
         
         {/* Widget 1: Modalidad y Entorno de Trabajo */}
         <div className="bg-white p-6 rounded-2xl border border-[#E2DACB] shadow-xs space-y-4">
-          <h3 className="text-sm font-serif font-bold text-[#0A1E42] uppercase tracking-wider flex items-center gap-2">
+          <h3 className="text-sm font-bold text-[#0A1E42] uppercase tracking-wider flex items-center gap-2">
             Modalidad de Trabajo (Activos)
           </h3>
           <div className="space-y-3">
@@ -201,17 +229,23 @@ export default async function DashboardPage() {
               );
             })}
           </div>
-          <p className="text-[11px] font-serif italic text-[#5C6779] pt-2 border-t border-[#E2DACB]">
+          <p className="text-[11px] italic text-[#5C6779] pt-2 border-t border-[#E2DACB]">
             Distribución operativa para sedes y proyectos de investigación del PUIC.
           </p>
         </div>
 
-        {/* Widget 2: Top Planteles / Facultades UNAM */}
+        {/* Widget 2: Top Planteles / Escuelas */}
         <div className="bg-white p-6 rounded-2xl border border-[#E2DACB] shadow-xs space-y-4">
-          <h3 className="text-sm font-serif font-bold text-[#0A1E42] uppercase tracking-wider flex items-center gap-2">
-            <Building2 size={16} className="text-[#0A1E42]" />
-            Principales Planteles UNAM
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-[#0A1E42] uppercase tracking-wider flex items-center gap-2">
+              <Building2 size={16} className="text-[#0A1E42]" />
+              Principales Escuelas
+            </h3>
+            <div className="flex items-center gap-1 text-[10px] font-bold">
+              <span className="text-[#9E6B1D] bg-[#C68A2C]/15 px-1.5 py-0.5 rounded">UNAM: {data.totalUnam}</span>
+              <span className="text-[#008A7C] bg-[#008A7C]/15 px-1.5 py-0.5 rounded">Ext: {data.totalExternos}</span>
+            </div>
+          </div>
           <div className="space-y-3">
             {data.topPlanteles.length === 0 ? (
               <p className="text-xs text-slate-400">Sin datos registrados aún.</p>
@@ -238,7 +272,7 @@ export default async function DashboardPage() {
 
         {/* Widget 3: Top Carreras */}
         <div className="bg-white p-6 rounded-2xl border border-[#E2DACB] shadow-xs space-y-4">
-          <h3 className="text-sm font-serif font-bold text-[#0A1E42] uppercase tracking-wider flex items-center gap-2">
+          <h3 className="text-sm font-bold text-[#0A1E42] uppercase tracking-wider flex items-center gap-2">
             <BookOpen size={16} className="text-[#C68A2C]" />
             Disciplinas y Carreras Top
           </h3>
@@ -276,11 +310,11 @@ export default async function DashboardPage() {
               <span className="p-1.5 bg-rose-100 text-rose-800 rounded-lg">
                 <AlertOctagon size={18} />
               </span>
-              <h2 className="text-base font-serif font-bold text-[#0A1E42]">
+              <h2 className="text-base font-bold text-[#0A1E42]">
                 Semáforo de Vencimientos y Liberaciones Pendientes
               </h2>
             </div>
-            <p className="text-xs text-[#5C6779] mt-1 font-serif italic">
+            <p className="text-xs text-[#5C6779] mt-1 italic">
               Alumnos con fecha tentativa vencida o que concluyen dentro de los próximos 30 días.
             </p>
           </div>
@@ -296,7 +330,7 @@ export default async function DashboardPage() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-[#0A1E42] text-xs uppercase font-serif text-slate-200 border-b border-[#06132A]">
+            <thead className="bg-[#0A1E42] text-xs uppercase text-slate-200 border-b border-[#06132A]">
               <tr>
                 <th className="p-4 tracking-wider">Clave / No. Cuenta</th>
                 <th className="p-4 tracking-wider">Alumno</th>
@@ -310,7 +344,7 @@ export default async function DashboardPage() {
             <tbody className="divide-y divide-[#E2DACB]/60">
               {data.vencidos.length === 0 && data.proximosAVencer.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-[#5C6779] font-serif italic">
+                  <td colSpan={7} className="p-8 text-center text-[#5C6779] italic">
                     No hay expedientes en estado de riesgo o próximos a vencer. Todos los registros activos están en tiempo.
                   </td>
                 </tr>
@@ -329,7 +363,7 @@ export default async function DashboardPage() {
                         <div className="font-mono text-[11px] text-[#5C6779]">Cta: {exp.numeroCuenta}</div>
                       </td>
                       <td className="p-4">
-                        <div className="font-serif font-bold text-[#0A1E42] text-xs sm:text-sm">
+                        <div className="font-bold text-[#0A1E42] text-xs sm:text-sm">
                           {exp.nombre} {exp.apPaterno} {exp.apMaterno}
                         </div>
                       </td>
@@ -364,7 +398,7 @@ export default async function DashboardPage() {
                       <td className="p-4 text-right">
                         <Link
                           href={`/expedientes/${exp.idExpediente}`}
-                          className="inline-flex items-center gap-1 text-xs font-serif font-bold text-[#0A1E42] hover:text-[#C68A2C] transition-colors"
+                          className="inline-flex items-center gap-1 text-xs font-bold text-[#0A1E42] hover:text-[#C68A2C] transition-colors"
                         >
                           Ver Ficha
                           <ExternalLink size={13} />

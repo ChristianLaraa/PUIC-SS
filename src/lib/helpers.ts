@@ -24,10 +24,10 @@ export function generarClaveExpediente(
   fechaInicio: string
 ): string {
   if (!numeroCuenta || !fechaInicio) return '';
-  const cleanCuenta = numeroCuenta.replace(/\D/g, ''); // Solo números
+  const cleanCuenta = numeroCuenta.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() || 'EXT';
   const [year, month, day] = fechaInicio.split('-');
   const shortYear = year ? year.slice(-2) : '';
-  return `${tipo}-${cleanCuenta}-${day}${month}${shortYear}`;
+  return `${tipo}-${cleanCuenta}-${day || '01'}${month || '01'}${shortYear}`;
 }
 
 

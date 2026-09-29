@@ -21,6 +21,10 @@ model Plantel {
   idPlantel   Int          @id @default(autoincrement())
   nombre      String       @unique
   siglas      String?
+  institucion String       @default("UNAM") // Ej. "UNAM", "IPN", "UAM", "UAEMex", "TecNM", "Privada", etc.
+  esUnam      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt @default(now())
   expedientes Expediente[]
 }
 

@@ -7,14 +7,14 @@ export default function InstitutionalHeader() {
       {/* Listón Conmemorativo 475+ (Inspirado en el cartel oficial) */}
       <div className="absolute top-0 right-6 sm:right-10 hidden lg:block z-30 drop-shadow-md">
         <div className="bg-[#C68A2C] text-white px-3.5 pt-2 pb-4 text-center ribbon-475 relative flex flex-col items-center min-w-[100px]">
-          <span className="text-[13px] font-serif font-black tracking-tight leading-none">
+          <span className="text-[13px] font-black tracking-tight leading-none">
             475+
           </span>
           <span className="text-[7.5px] uppercase tracking-widest font-sans font-bold mt-0.5 whitespace-nowrap opacity-95">
             Universidad de México
           </span>
           <div className="w-8 h-px bg-white/40 my-1" />
-          <span className="text-[6.5px] tracking-tight font-serif italic text-white/90">
+          <span className="text-[6.5px] tracking-tight italic text-white/90">
             UNAM rumbo al medio milenio
           </span>
         </div>
@@ -48,14 +48,14 @@ export default function InstitutionalHeader() {
 
           <div className="border-l border-[#E2DACB] pl-3 sm:pl-4">
             <div className="flex items-center gap-2">
-              <h1 className="font-serif text-sm sm:text-base md:text-lg font-bold text-[#0A1E42] leading-tight tracking-tight">
+              <h1 className="text-sm sm:text-base md:text-lg font-bold text-[#0A1E42] leading-tight tracking-tight">
                 Universidad Nacional Autónoma de México
               </h1>
               <span className="hidden xl:inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[#C68A2C]/15 text-[#9E6B1D] border border-[#C68A2C]/30">
                 <Award size={11} /> 475 Años
               </span>
             </div>
-            <p className="font-serif text-xs text-[#5C6779] italic font-medium">
+            <p className="text-xs text-[#5C6779] italic font-medium">
               Programa Universitario de Estudios de la Diversidad Cultural y la Interculturalidad (PUIC)
             </p>
           </div>
@@ -64,7 +64,7 @@ export default function InstitutionalHeader() {
         {/* Bloque Secundario: Dependencias y Enlaces */}
         <div className="flex items-center gap-3 self-end md:self-auto text-xs pr-0 lg:pr-32">
           <div className="hidden sm:flex flex-col text-right border-r border-[#E2DACB] pr-3.5">
-            <span className="font-serif font-bold text-[#0A1E42] text-xs">
+            <span className="font-bold text-[#0A1E42] text-xs">
               Coordinación de Humanidades
             </span>
             <span className="text-[11px] text-[#5C6779]">

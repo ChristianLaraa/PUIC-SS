@@ -1,19 +1,13 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import AppShell from "@/components/layout/AppShell";
 import { getSession } from "@/lib/auth";
 
-const cormorant = Cormorant_Garamond({
+const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-cormorant",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins",
   display: "swap",
 });
 
@@ -30,7 +24,7 @@ export default async function RootLayout({
   const user = await getSession();
 
   return (
-    <html lang="es" className={`${cormorant.variable} ${inter.variable}`}>
+    <html lang="es" className={poppins.variable}>
       <body className="bg-[#FBF9F5] text-[#0E1B2E] antialiased min-h-screen font-sans selection:bg-[#C68A2C]/25 selection:text-[#0A1E42]">
         <AppShell user={user}>
           {children}

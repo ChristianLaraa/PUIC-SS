@@ -35,6 +35,42 @@ export const GRADOS_ACADEMICOS = [
   
   export const TURNOS = ['Matutino', 'Vespertino', 'Mixto'];
   
+  export const INSTITUCIONES_DISPONIBLES = [
+    'UNAM',
+    'Instituto Politécnico Nacional (IPN)',
+    'Universidad Autónoma Metropolitana (UAM)',
+    'Universidad Autónoma del Estado de México (UAEMex)',
+    'Tecnológico Nacional de México (TecNM)',
+    'Universidad Pedagógica Nacional (UPN)',
+    'Universidad Autónoma de la Ciudad de México (UACM)',
+    'Tecnológico de Monterrey (ITESM)',
+    'Universidad Iberoamericana (IBERO)',
+    'Universidad Anáhuac',
+    'Universidad La Salle',
+    'Universidad del Valle de México (UVM)',
+    'Universidad Tecnológica de México (UNITEC)',
+    'Otra Institución',
+  ];
+
+  export const PLANTELES_EXTERNOS_SUGERIDOS = [
+    { nombre: 'Escuela Superior de Cómputo (ESCOM) - IPN', institucion: 'Instituto Politécnico Nacional (IPN)', siglas: 'ESCOM' },
+    { nombre: 'Unidad Profesional Interdisciplinaria en Ingeniería y Tecnologías Avanzadas (UPIITA) - IPN', institucion: 'Instituto Politécnico Nacional (IPN)', siglas: 'UPIITA' },
+    { nombre: 'Escuela Superior de Ingeniería Mecánica y Eléctrica (ESIME) - IPN', institucion: 'Instituto Politécnico Nacional (IPN)', siglas: 'ESIME' },
+    { nombre: 'Escuela Nacional de Ciencias Biológicas (ENCB) - IPN', institucion: 'Instituto Politécnico Nacional (IPN)', siglas: 'ENCB' },
+    { nombre: 'Escuela Superior de Comercio y Administración (ESCA) - IPN', institucion: 'Instituto Politécnico Nacional (IPN)', siglas: 'ESCA' },
+    { nombre: 'UAM Unidad Xochimilco', institucion: 'Universidad Autónoma Metropolitana (UAM)', siglas: 'UAM-X' },
+    { nombre: 'UAM Unidad Azcapotzalco', institucion: 'Universidad Autónoma Metropolitana (UAM)', siglas: 'UAM-A' },
+    { nombre: 'UAM Unidad Iztapalapa', institucion: 'Universidad Autónoma Metropolitana (UAM)', siglas: 'UAM-I' },
+    { nombre: 'UAM Unidad Cuajimalpa', institucion: 'Universidad Autónoma Metropolitana (UAM)', siglas: 'UAM-C' },
+    { nombre: 'UAM Unidad Lerma', institucion: 'Universidad Autónoma Metropolitana (UAM)', siglas: 'UAM-L' },
+    { nombre: 'Facultad de Ciencias Políticas y Sociales - UAEMex', institucion: 'Universidad Autónoma del Estado de México (UAEMex)', siglas: 'UAEMex' },
+    { nombre: 'Facultad de Humanidades - UAEMex', institucion: 'Universidad Autónoma del Estado de México (UAEMex)', siglas: 'UAEMex' },
+    { nombre: 'Instituto Tecnológico de Gustavo A. Madero - TecNM', institucion: 'Tecnológico Nacional de México (TecNM)', siglas: 'ITGAM' },
+    { nombre: 'Instituto Tecnológico de Tlalnepantla - TecNM', institucion: 'Tecnológico Nacional de México (TecNM)', siglas: 'ITTLA' },
+    { nombre: 'Universidad Pedagógica Nacional Unidad Ajusco (UPN)', institucion: 'Universidad Pedagógica Nacional (UPN)', siglas: 'UPN-Ajusco' },
+    { nombre: 'UACM Plantel San Lorenzo Tezonco', institucion: 'Universidad Autónoma de la Ciudad de México (UACM)', siglas: 'UACM-SLT' },
+  ];
+
   export const PLANTELES_UNAM = [
     'Facultad de Artes y Diseño (FAD)',
     'Facultad de Ciencias',

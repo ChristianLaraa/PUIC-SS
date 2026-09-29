@@ -84,6 +84,46 @@ export async function getDashboardData() {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 4);
 
+  // Distribución Institucional y Escuelas Externas
+  const expedientesExternos = expedientes.filter((e) => e.plantel?.esUnam === false);
+  const totalUnam = expedientes.filter((e) => e.plantel?.esUnam !== false).length;
+  const totalExternos = expedientesExternos.length;
+  const activosExternos = expedientesExternos.filter((e) => e.estatus === 'Activo').length;
+  const activosUnam = activos.filter((e) => e.plantel?.esUnam !== false).length;
+
+  // Desglose por Institución Externa (ej. IPN, UAM, UAEMex, etc.)
+  const instExternasCount: Record<string, number> = {};
+  const escuelasExternasCount: Record<string, { institucion: string; count: number }> = {};
+
+  expedientesExternos.forEach((e) => {
+    const inst = e.plantel?.institucion || 'Otras Instituciones';
+    instExternasCount[inst] = (instExternasCount[inst] || 0) + 1;
+
+    const escuela = e.plantel?.nombre || 'Escuela Externa';
+    if (!escuelasExternasCount[escuela]) {
+      escuelasExternasCount[escuela] = {
+        institucion: inst,
+        count: 0,
+      };
+    }
+    escuelasExternasCount[escuela].count += 1;
+  });
+
+  const topInstitucionesExternas = Object.entries(instExternasCount)
+    .sort((a, b) => b[1] - a[1]);
+
+  const topPlantelesExternos = Object.entries(escuelasExternasCount)
+    .map(([nombre, item]) => ({
+      nombre,
+      institucion: item.institucion,
+      total: item.count,
+    }))
+    .sort((a, b) => b.total - a.total);
+
+  const totalPlantelesExternos = await prisma.plantel.count({
+    where: { esUnam: false },
+  });
+
   return {
     totalExpedientes,
     totalActivos,
@@ -91,6 +131,13 @@ export async function getDashboardData() {
     totalPP,
     totalTerminados,
     totalDeclinados,
+    totalUnam,
+    totalExternos,
+    activosExternos,
+    activosUnam,
+    totalPlantelesExternos,
+    topInstitucionesExternas,
+    topPlantelesExternos,
     tasaExito,
     vencidos,
     proximosAVencer,
@@ -104,6 +151,7 @@ export async function getExpedienteById(id: number) {
   return prisma.expediente.findUnique({
     where: { idExpediente: id },
     include: {
+      plantel: true,
       carrera: true,
       coordinador: true,
       seguimiento: true,
@@ -125,6 +173,9 @@ export async function registrarExpediente(data: {
   semestre: string;
   // Adscripción
   plantelNombre: string;
+  plantelInstitucion?: string;
+  esUnam?: boolean;
+  plantelSiglas?: string;
   carreraNombre: string;
   // Programa
   tipoPrograma: string;
@@ -143,18 +194,31 @@ export async function registrarExpediente(data: {
   preRegistro?: string;
   registro?: string;
 }) {
-  // Asegurar o crear Plantel
+  const nombrePlantelLimpio = data.plantelNombre.trim();
+  const institucionLimpia = data.plantelInstitucion?.trim() || (data.esUnam !== false ? 'UNAM' : 'Externa');
+  const esUnam = data.esUnam ?? (institucionLimpia.toUpperCase().includes('UNAM'));
+
+  // Asegurar o crear Plantel con su metadata institucional
   const plantel = await prisma.plantel.upsert({
-    where: { nombre: data.plantelNombre },
-    update: {},
-    create: { nombre: data.plantelNombre },
+    where: { nombre: nombrePlantelLimpio },
+    update: {
+      institucion: institucionLimpia,
+      esUnam,
+      siglas: data.plantelSiglas?.trim() || undefined,
+    },
+    create: {
+      nombre: nombrePlantelLimpio,
+      institucion: institucionLimpia,
+      esUnam,
+      siglas: data.plantelSiglas?.trim() || null,
+    },
   });
 
   // Asegurar o crear Carrera
   const carrera = await prisma.carrera.upsert({
-    where: { nombre: data.carreraNombre },
+    where: { nombre: data.carreraNombre.trim() },
     update: {},
-    create: { nombre: data.carreraNombre },
+    create: { nombre: data.carreraNombre.trim() },
   });
 
   // Crear Coordinador con su grado académico

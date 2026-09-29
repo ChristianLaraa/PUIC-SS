@@ -35,7 +35,7 @@ export default function Sidebar({ user }: SidebarProps) {
               className="h-10 w-auto object-contain brightness-110"
             />
           </div>
-          <span className="text-[#C68A2C]/60 text-xs font-serif">|</span>
+          <span className="text-[#C68A2C]/60 text-xs">|</span>
           <div className="flex h-12 w-20 items-center justify-center">
             <Image
               src="/puic.png"
@@ -52,7 +52,7 @@ export default function Sidebar({ user }: SidebarProps) {
           <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-[#C68A2C]/20 text-[#DF9F38] border border-[#C68A2C]/40">
             <Award size={10} /> 475 Años de Historia
           </span>
-          <h2 className="text-xs font-serif font-bold text-white tracking-wide leading-snug">
+          <h2 className="text-xs font-bold text-white tracking-wide leading-snug">
             Programa Universitario de Estudios de la Diversidad Cultural y la Interculturalidad
           </h2>
           <p className="text-[11px] text-[#DF9F38] font-medium">Servicio Social y Prácticas</p>
@@ -90,7 +90,7 @@ export default function Sidebar({ user }: SidebarProps) {
       {user && (
         <div className="p-3.5 mx-3 mb-3 rounded-xl bg-[#06132A]/90 border border-[#C68A2C]/30 shadow-inner">
           <div className="flex items-center gap-2.5 mb-2.5">
-            <div className="w-8 h-8 rounded-full bg-[#C68A2C]/20 border border-[#C68A2C] flex items-center justify-center text-[#DF9F38] font-serif font-bold text-xs shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#C68A2C]/20 border border-[#C68A2C] flex items-center justify-center text-[#DF9F38] font-bold text-xs shrink-0">
               {user.nombreCompleto?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
@@ -130,7 +130,7 @@ export default function Sidebar({ user }: SidebarProps) {
 
       {/* Pie Institucional Conmemorativo */}
       <div className="p-4 border-t border-[#163670]/60 text-center bg-[#06132A]/30">
-        <p className="text-[10px] font-serif tracking-wider text-slate-400">
+        <p className="text-[10px] tracking-wider text-slate-400">
           UNAM • 475 AÑOS • PUIC
         </p>
         <p className="text-[9px] text-[#C68A2C]/80 italic mt-0.5">

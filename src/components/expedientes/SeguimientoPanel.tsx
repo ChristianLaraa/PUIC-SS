@@ -76,7 +76,7 @@ export default function SeguimientoPanel({ idExpediente, estatusActual, seguimie
         <div className="flex items-center justify-between border-b border-[#E2DACB] pb-4">
           <div className="flex items-center gap-2">
             <FileText className="text-[#C68A2C]" size={20} />
-            <h2 className="font-serif text-lg font-bold text-[#0A1E42]">Control Documental Institucional</h2>
+            <h2 className="text-lg font-bold text-[#0A1E42]">Control Documental Institucional</h2>
           </div>
           {mensajeChecklist && (
             <span className="text-xs text-[#008A7C] font-semibold">{mensajeChecklist}</span>
@@ -95,14 +95,14 @@ export default function SeguimientoPanel({ idExpediente, estatusActual, seguimie
                 className="mt-0.5 h-4 w-4 rounded border-[#E2DACB] text-[#0A1E42] focus:ring-[#C68A2C]"
               />
               <div>
-                <span className="text-sm font-serif font-bold text-[#0A1E42]">1. Carta de Aceptación Oficial</span>
+                <span className="text-sm font-bold text-[#0A1E42]">1. Carta de Aceptación Oficial</span>
                 <p className="text-xs text-[#5C6779]">Documento sellado y avalado por el PUIC / entidad receptora.</p>
               </div>
             </label>
 
             {/* Input: Enlace al Informe Final */}
             <div className="p-3.5 rounded-xl border border-[#E2DACB] space-y-2 bg-[#FBF9F5]/60">
-              <span className="text-sm font-serif font-bold text-[#0A1E42]">2. Informe Final de Actividades</span>
+              <span className="text-sm font-bold text-[#0A1E42]">2. Informe Final de Actividades</span>
               <p className="text-xs text-[#5C6779]">Liga en la nube (Drive institucional, repositorio o PDF) con el informe.</p>
               <div className="flex gap-2 items-center">
                 <input
@@ -137,7 +137,7 @@ export default function SeguimientoPanel({ idExpediente, estatusActual, seguimie
                 className="mt-0.5 h-4 w-4 rounded border-[#E2DACB] text-[#0A1E42] focus:ring-[#C68A2C]"
               />
               <div>
-                <span className="text-sm font-serif font-bold text-[#0A1E42]">3. Carta de Término y Liberación</span>
+                <span className="text-sm font-bold text-[#0A1E42]">3. Carta de Término y Liberación</span>
                 <p className="text-xs text-[#5C6779]">Constancia institucional que avala las 480 horas reglamentarias.</p>
               </div>
             </label>
@@ -148,7 +148,7 @@ export default function SeguimientoPanel({ idExpediente, estatusActual, seguimie
               <button
                 type="submit"
                 disabled={isPending}
-                className="px-5 py-2.5 bg-[#0A1E42] hover:bg-[#06132A] text-white font-serif font-bold text-xs rounded-xl border-b-2 border-[#C68A2C] transition-all disabled:opacity-50 cursor-pointer shadow-xs"
+                className="px-5 py-2.5 bg-[#0A1E42] hover:bg-[#06132A] text-white font-bold text-xs rounded-xl border-b-2 border-[#C68A2C] transition-all disabled:opacity-50 cursor-pointer shadow-xs"
               >
                 {isPending ? 'Guardando...' : 'Guardar Checklist Documental'}
               </button>
@@ -160,11 +160,11 @@ export default function SeguimientoPanel({ idExpediente, estatusActual, seguimie
       {/* Columna derecha: Acciones de Estatus */}
       <div className="bg-white p-6 rounded-2xl border border-[#E2DACB] shadow-xs space-y-6 flex flex-col justify-between">
         <div>
-          <h2 className="font-serif text-lg font-bold text-[#0A1E42] border-b border-[#E2DACB] pb-4">Gestión de Estatus</h2>
+          <h2 className="text-lg font-bold text-[#0A1E42] border-b border-[#E2DACB] pb-4">Gestión de Estatus</h2>
           <div className="mt-4 space-y-4">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#5C6779]">Estatus del Expediente</span>
-              <p className="font-serif text-lg font-bold mt-1 text-[#0A1E42]">{estatusActual}</p>
+              <p className="text-lg font-bold mt-1 text-[#0A1E42]">{estatusActual}</p>
             </div>
 
             {seguimiento?.declinacionObs && (
@@ -181,7 +181,7 @@ export default function SeguimientoPanel({ idExpediente, estatusActual, seguimie
             <button
               onClick={handleConcluir}
               disabled={isPending}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#008A7C] hover:bg-[#007367] text-white font-serif text-xs font-bold rounded-xl transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#008A7C] hover:bg-[#007367] text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
             >
               <CheckCircle2 size={16} />
               Acreditar y Concluir Expediente

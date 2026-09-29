@@ -26,7 +26,12 @@ interface ExpedienteItem {
   estatus: string;
   fechaInicio: Date | string;
   fechaTentativa: Date | string;
-  plantel?: { nombre: string } | null;
+  plantel?: {
+    nombre: string;
+    institucion?: string;
+    esUnam?: boolean;
+    siglas?: string | null;
+  } | null;
   carrera?: { nombre: string } | null;
   coordinador?: { nombreCompleto: string; gradoAcademico: string } | null;
 }
@@ -44,6 +49,11 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
   );
   const [filtroCiclo, setFiltroCiclo] = useState('TODOS');
   const [filtroModalidad, setFiltroModalidad] = useState('TODOS');
+  const [filtroOrigen, setFiltroOrigen] = useState<'TODOS' | 'UNAM' | 'EXTERNA'>(() => {
+    const o = searchParams.get('origen');
+    if (o === 'UNAM' || o === 'EXTERNA') return o;
+    return 'TODOS';
+  });
 
   // Obtener lista única de planteles presentes en los expedientes
   const plantelesDisponibles = useMemo(() => {
@@ -58,7 +68,7 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
   // Lógica de filtrado reactivo combinada
   const expedientesFiltrados = useMemo(() => {
     return expedientes.filter((exp) => {
-      // 1. Filtro texto (Nombre, No. Cuenta, Clave, Carrera)
+      // 1. Filtro texto (Nombre, No. Cuenta, Clave, Carrera, Plantel, Institución)
       const termino = busqueda.toLowerCase().trim();
       const nombreCompleto = `${exp.nombre} ${exp.apPaterno} ${exp.apMaterno}`.toLowerCase();
       const matchBusqueda =
@@ -66,7 +76,9 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
         nombreCompleto.includes(termino) ||
         exp.numeroCuenta.toLowerCase().includes(termino) ||
         exp.clave.toLowerCase().includes(termino) ||
-        (exp.carrera?.nombre ?? '').toLowerCase().includes(termino);
+        (exp.carrera?.nombre ?? '').toLowerCase().includes(termino) ||
+        (exp.plantel?.nombre ?? '').toLowerCase().includes(termino) ||
+        (exp.plantel?.institucion ?? '').toLowerCase().includes(termino);
 
       // 2. Filtro programa
       const matchPrograma = filtroPrograma === 'TODOS' || exp.tipoPrograma === filtroPrograma;
@@ -83,9 +95,17 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
       // 6. Filtro plantel
       const matchPlantel = filtroPlantel === 'TODOS' || exp.plantel?.nombre === filtroPlantel;
 
-      return matchBusqueda && matchPrograma && matchEstatus && matchCiclo && matchModalidad && matchPlantel;
+      // 7. Filtro origen institucional (UNAM vs Externa)
+      const matchOrigen =
+        filtroOrigen === 'TODOS'
+          ? true
+          : filtroOrigen === 'UNAM'
+          ? exp.plantel?.esUnam !== false
+          : exp.plantel?.esUnam === false;
+
+      return matchBusqueda && matchPrograma && matchEstatus && matchCiclo && matchModalidad && matchPlantel && matchOrigen;
     });
-  }, [expedientes, busqueda, filtroPrograma, filtroEstatus, filtroCiclo, filtroModalidad, filtroPlantel]);
+  }, [expedientes, busqueda, filtroPrograma, filtroEstatus, filtroCiclo, filtroModalidad, filtroPlantel, filtroOrigen]);
 
   const hayFiltrosActivos =
     busqueda !== '' ||
@@ -93,7 +113,8 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
     filtroEstatus !== 'TODOS' ||
     filtroCiclo !== 'TODOS' ||
     filtroModalidad !== 'TODOS' ||
-    filtroPlantel !== 'TODOS';
+    filtroPlantel !== 'TODOS' ||
+    filtroOrigen !== 'TODOS';
 
   function resetFiltros() {
     setBusqueda('');
@@ -102,6 +123,7 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
     setFiltroCiclo('TODOS');
     setFiltroModalidad('TODOS');
     setFiltroPlantel('TODOS');
+    setFiltroOrigen('TODOS');
   }
 
   return (
@@ -110,14 +132,14 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E2DACB] pb-5">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1 text-[11px] font-serif font-bold text-[#9E6B1D] bg-[#C68A2C]/15 px-2 py-0.5 rounded border border-[#C68A2C]/30">
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#9E6B1D] bg-[#C68A2C]/15 px-2 py-0.5 rounded border border-[#C68A2C]/30">
               <Award size={12} /> PUIC • 475 Años UNAM
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#0A1E42] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0A1E42] tracking-tight">
             Directorio Institucional de Expedientes
           </h1>
-          <p className="text-sm font-serif italic text-[#5C6779] mt-0.5">
+          <p className="text-sm italic text-[#5C6779] mt-0.5">
             Registro, consulta y seguimiento de prestadores de Servicio Social y Prácticas Profesionales.
           </p>
         </div>
@@ -145,7 +167,23 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
         </div>
 
         {/* Selectores de Filtro Específico */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
+          {/* Origen Institucional */}
+          <div>
+            <label className="text-[11px] font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
+              Origen Institución
+            </label>
+            <select
+              value={filtroOrigen}
+              onChange={(e) => setFiltroOrigen(e.target.value as 'TODOS' | 'UNAM' | 'EXTERNA')}
+              className="w-full p-2 border border-[#E2DACB] rounded-xl text-xs bg-[#FBF9F5] focus:ring-2 focus:ring-[#C68A2C] outline-none"
+            >
+              <option value="TODOS">Todas las instituciones</option>
+              <option value="UNAM">Comunidad UNAM</option>
+              <option value="EXTERNA">No UNAM / Externas</option>
+            </select>
+          </div>
+
           {/* Programa */}
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
@@ -214,7 +252,7 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
           </div>
 
           {/* Plantel */}
-          <div className="col-span-2 sm:col-span-1">
+          <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
               Plantel / Escuela
             </label>
@@ -252,7 +290,7 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
       <div className="bg-white rounded-2xl border border-[#E2DACB] shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-[#0A1E42] text-xs uppercase font-serif text-slate-200 border-b border-[#06132A]">
+            <thead className="bg-[#0A1E42] text-xs uppercase text-slate-200 border-b border-[#06132A]">
               <tr>
                 <th className="p-4 tracking-wider">Clave / No. Cuenta</th>
                 <th className="p-4 tracking-wider">Alumno</th>
@@ -272,7 +310,7 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
                       <div className="w-12 h-12 rounded-full bg-[#F5F0E6] text-[#9E6B1D] flex items-center justify-center mx-auto">
                         <Filter size={24} />
                       </div>
-                      <p className="text-[#0A1E42] font-serif font-bold text-base">No se encontraron expedientes</p>
+                      <p className="text-[#0A1E42] font-bold text-base">No se encontraron expedientes</p>
                       <p className="text-xs text-[#5C6779]">
                         {hayFiltrosActivos
                           ? 'Ningún registro coincide con los criterios de búsqueda seleccionados.'
@@ -306,7 +344,7 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
 
                       {/* Alumno */}
                       <td className="p-4">
-                        <div className="font-serif font-bold text-[#0A1E42]">
+                        <div className="font-bold text-[#0A1E42]">
                           {exp.nombre} {exp.apPaterno} {exp.apMaterno}
                         </div>
                         <div className="text-xs text-[#5C6779] mt-0.5">
@@ -330,13 +368,24 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
                         </div>
                       </td>
 
-                      {/* Procedencia (Plantel y Carrera) */}
+                      {/* Procedencia (Plantel, Carrera e Institución) */}
                       <td className="p-4 max-w-xs">
-                        <div className="text-xs font-medium text-[#0E1B2E] truncate" title={exp.carrera?.nombre ?? ''}>
+                        <div className="text-xs font-semibold text-[#0E1B2E] truncate" title={exp.carrera?.nombre ?? ''}>
                           {exp.carrera?.nombre ?? 'Sin carrera'}
                         </div>
                         <div className="text-[11px] text-[#5C6779] truncate mt-0.5" title={exp.plantel?.nombre ?? ''}>
                           {exp.plantel?.nombre ?? 'Sin plantel'}
+                        </div>
+                        <div className="mt-1">
+                          <span
+                            className={`inline-block text-[9.5px] font-bold px-1.5 py-0.2 rounded ${
+                              exp.plantel?.esUnam !== false
+                                ? 'bg-[#C68A2C]/15 text-[#9E6B1D] border border-[#C68A2C]/30'
+                                : 'bg-[#008A7C]/15 text-[#008A7C] border border-[#008A7C]/30'
+                            }`}
+                          >
+                            {exp.plantel?.institucion ?? (exp.plantel?.esUnam !== false ? 'UNAM' : 'Externa')}
+                          </span>
                         </div>
                       </td>
 
@@ -375,7 +424,7 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
                       <td className="p-4 text-right">
                         <Link
                           href={`/expedientes/${exp.idExpediente}`}
-                          className="inline-flex items-center gap-1 text-[#0A1E42] hover:text-[#C68A2C] font-serif font-bold text-xs transition-colors"
+                          className="inline-flex items-center gap-1 text-[#0A1E42] hover:text-[#C68A2C] font-bold text-xs transition-colors"
                         >
                           Ficha
                           <ArrowRight size={14} />
