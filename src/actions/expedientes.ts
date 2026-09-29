@@ -3,6 +3,29 @@
 import { prisma } from '../lib/db';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { generarFolioExpediente } from '@/lib/helpers';
+
+export async function obtenerSiguienteNumeroFolio(): Promise<number> {
+  const [total, ultimo] = await Promise.all([
+    prisma.expediente.count(),
+    prisma.expediente.findFirst({
+      orderBy: { idExpediente: 'desc' },
+      select: { idExpediente: true, clave: true },
+    }),
+  ]);
+
+  let consecutivo = Math.max(total + 1, (ultimo?.idExpediente ?? 0) + 1);
+
+  // Si el último ya tenía formato de 6 dígitos numéricos, extraer su correlativo
+  if (ultimo?.clave && /^\d{6}$/.test(ultimo.clave)) {
+    const numPart = parseInt(ultimo.clave.slice(2), 10);
+    if (!isNaN(numPart)) {
+      consecutivo = Math.max(consecutivo, numPart + 1);
+    }
+  }
+
+  return consecutivo;
+}
 
 export async function getExpedientes() {
   return prisma.expediente.findMany({
@@ -229,10 +252,36 @@ export async function registrarExpediente(data: {
     },
   });
 
+  // Asegurar que el folio (clave) sea único y consecutivo
+  let folioFinal = data.clave?.trim() || '';
+  if (!folioFinal || !/^\d{6}$/.test(folioFinal)) {
+    const siguienteNum = await obtenerSiguienteNumeroFolio();
+    folioFinal = generarFolioExpediente(data.fechaInicio, siguienteNum);
+  }
+
+  // Verificar si ya existe por concurrencia
+  let existe = await prisma.expediente.findUnique({
+    where: { clave: folioFinal },
+    select: { idExpediente: true },
+  });
+
+  if (existe) {
+    let intento = 1;
+    const siguienteNum = await obtenerSiguienteNumeroFolio();
+    while (existe) {
+      folioFinal = generarFolioExpediente(data.fechaInicio, siguienteNum + intento);
+      existe = await prisma.expediente.findUnique({
+        where: { clave: folioFinal },
+        select: { idExpediente: true },
+      });
+      intento++;
+    }
+  }
+
   // Crear Expediente completo
   await prisma.expediente.create({
     data: {
-      clave: data.clave,
+      clave: folioFinal,
       nombre: data.nombre,
       apPaterno: data.apPaterno,
       apMaterno: data.apMaterno,
@@ -271,23 +320,41 @@ export async function registrarExpediente(data: {
 export async function actualizarSeguimientoDocumental(
   idExpediente: number,
   data: {
-    cartaAceptacion: boolean;
-    informeFinalUrl?: string;
-    cartaTermino: boolean;
+    cartaPresentacionUrl?: string | null;
+    cartaPresentacionFolio?: string | null;
+    cartaAceptacionUrl?: string | null;
+    cartaAceptacionRecogida?: boolean;
+    cartaAceptacionFolio?: string | null;
+    cartaAceptacion?: boolean;
+    informeFinalUrl?: string | null;
+    aplicaInformeFinal?: boolean;
+    informeFinalFolio?: string | null;
+    cartaTerminoUrl?: string | null;
+    cartaTerminoFolio?: string | null;
+    cartaTermino?: boolean;
   }
 ) {
+  const payload = {
+    cartaPresentacionUrl: data.cartaPresentacionUrl?.trim() || null,
+    cartaPresentacionFolio: data.cartaPresentacionFolio?.trim() || null,
+    cartaAceptacionUrl: data.cartaAceptacionUrl?.trim() || null,
+    cartaAceptacionRecogida: data.cartaAceptacionRecogida ?? false,
+    cartaAceptacionFolio: data.cartaAceptacionFolio?.trim() || null,
+    cartaAceptacion: data.cartaAceptacion ?? Boolean(data.cartaAceptacionUrl || data.cartaAceptacionRecogida),
+    informeFinalUrl: data.informeFinalUrl?.trim() || null,
+    aplicaInformeFinal: data.aplicaInformeFinal ?? true,
+    informeFinalFolio: data.informeFinalFolio?.trim() || null,
+    cartaTerminoUrl: data.cartaTerminoUrl?.trim() || null,
+    cartaTerminoFolio: data.cartaTerminoFolio?.trim() || null,
+    cartaTermino: data.cartaTermino ?? Boolean(data.cartaTerminoUrl),
+  };
+
   await prisma.seguimientoDocumental.upsert({
     where: { idExpediente },
-    update: {
-      cartaAceptacion: data.cartaAceptacion,
-      informeFinalUrl: data.informeFinalUrl || null,
-      cartaTermino: data.cartaTermino,
-    },
+    update: payload,
     create: {
       idExpediente,
-      cartaAceptacion: data.cartaAceptacion,
-      informeFinalUrl: data.informeFinalUrl || null,
-      cartaTermino: data.cartaTermino,
+      ...payload,
     },
   });
 

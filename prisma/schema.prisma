@@ -86,16 +86,34 @@ model Expediente {
 }
 
 model SeguimientoDocumental {
-  idSeguimiento   Int        @id @default(autoincrement())
-  idExpediente    Int        @unique
-  expediente      Expediente @relation(fields: [idExpediente], references: [idExpediente], onDelete: Cascade)
+  idSeguimiento            Int        @id @default(autoincrement())
+  idExpediente             Int        @unique
+  expediente               Expediente @relation(fields: [idExpediente], references: [idExpediente], onDelete: Cascade)
   
-  preRegistro     DateTime?
-  registro        DateTime?
-  cartaAceptacion Boolean    @default(false)
-  informeFinalUrl String?
-  cartaTermino    Boolean    @default(false)
-  declinacionObs  String?
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  // 1. Carta de Presentación
+  cartaPresentacionUrl     String?
+  cartaPresentacionFolio   String?
+
+  // 2. Carta de Aceptación
+  cartaAceptacionUrl       String?
+  cartaAceptacionRecogida  Boolean    @default(false)
+  cartaAceptacionFolio     String?
+  cartaAceptacion          Boolean    @default(false)
+
+  // 3. Informe Final
+  informeFinalUrl          String?
+  aplicaInformeFinal       Boolean    @default(true)
+  informeFinalFolio        String?
+
+  // 4. Carta de Término
+  cartaTerminoUrl          String?
+  cartaTerminoFolio        String?
+  cartaTermino             Boolean    @default(false)
+
+  // Histórico y Observaciones
+  preRegistro              DateTime?
+  registro                 DateTime?
+  declinacionObs           String?
+  createdAt                DateTime   @default(now())
+  updatedAt                DateTime   @updatedAt
 }

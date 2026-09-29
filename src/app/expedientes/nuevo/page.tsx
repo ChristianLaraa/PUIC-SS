@@ -2,9 +2,13 @@ import ExpedienteForm from '@/components/expedientes/ExpedienteForm';
 import Link from 'next/link';
 import { Award, ArrowLeft } from 'lucide-react';
 import { getPlanteles } from '@/actions/planteles';
+import { obtenerSiguienteNumeroFolio } from '@/actions/expedientes';
 
 export default async function NuevoExpedientePage() {
-  const planteles = await getPlanteles();
+  const [planteles, siguienteNumero] = await Promise.all([
+    getPlanteles(),
+    obtenerSiguienteNumeroFolio(),
+  ]);
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -27,7 +31,7 @@ export default async function NuevoExpedientePage() {
         </Link>
       </div>
 
-      <ExpedienteForm plantelesIniciales={planteles} />
+      <ExpedienteForm plantelesIniciales={planteles} siguienteNumeroInicial={siguienteNumero} />
     </div>
   );
 }

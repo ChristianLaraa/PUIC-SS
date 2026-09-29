@@ -18,16 +18,30 @@ export function obtenerDiasRestantes(fechaTentativa: Date | string) {
   return { dias, esCritico: dias <= 30 && dias >= 0 };
 }
 
+/**
+ * Genera un folio institucional numérico e iterativo de 6 dígitos con base en los datos.
+ * Estructura: [2 dígitos del año de inicio o registro][4 dígitos del consecutivo iterativo]
+ * Ejemplo: Año 2026 y expediente #14 => "260014"
+ */
+export function generarFolioExpediente(
+  fechaInicio?: string,
+  consecutivo: number = 1
+): string {
+  const anio = fechaInicio && fechaInicio.includes('-')
+    ? fechaInicio.split('-')[0]
+    : String(new Date().getFullYear());
+  const year2Digits = (anio || String(new Date().getFullYear())).slice(-2);
+  const contador4Digits = String(Math.max(1, consecutivo)).padStart(4, '0');
+  return `${year2Digits}${contador4Digits}`;
+}
+
 export function generarClaveExpediente(
   tipo: 'SS' | 'PP',
   numeroCuenta: string,
-  fechaInicio: string
+  fechaInicio: string,
+  consecutivo: number = 1
 ): string {
-  if (!numeroCuenta || !fechaInicio) return '';
-  const cleanCuenta = numeroCuenta.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() || 'EXT';
-  const [year, month, day] = fechaInicio.split('-');
-  const shortYear = year ? year.slice(-2) : '';
-  return `${tipo}-${cleanCuenta}-${day || '01'}${month || '01'}${shortYear}`;
+  return generarFolioExpediente(fechaInicio, consecutivo);
 }
 
 

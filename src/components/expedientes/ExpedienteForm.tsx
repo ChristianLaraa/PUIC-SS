@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from 'react';
 import { registrarExpediente } from '@/actions/expedientes';
-import { generarClaveExpediente, calcularFechaTentativa } from '@/lib/helpers';
+import { generarFolioExpediente, calcularFechaTentativa } from '@/lib/helpers';
 import {
   GRADOS_ACADEMICOS,
   SEMESTRES_UNAM,
@@ -27,9 +27,13 @@ interface PlantelItem {
 
 interface ExpedienteFormProps {
   plantelesIniciales?: PlantelItem[];
+  siguienteNumeroInicial?: number;
 }
 
-export default function ExpedienteForm({ plantelesIniciales = [] }: ExpedienteFormProps) {
+export default function ExpedienteForm({
+  plantelesIniciales = [],
+  siguienteNumeroInicial = 14,
+}: ExpedienteFormProps) {
   const [isPending, startTransition] = useTransition();
 
   // 1. Datos Personales y de Contacto
@@ -125,27 +129,24 @@ export default function ExpedienteForm({ plantelesIniciales = [] }: ExpedienteFo
     return todas;
   }, [plantelesIniciales]);
 
-  // Valores derivados: cálculo de término y clave oficial
+  // Valores derivados: cálculo de término y folio oficial iterativo de 6 dígitos
   const fechaTentativa = useMemo(
     () => (fechaInicio ? calcularFechaTentativa(fechaInicio) : ''),
     [fechaInicio]
   );
 
-  const clave = useMemo(
-    () =>
-      numeroCuenta && fechaInicio
-        ? generarClaveExpediente(tipoPrograma, numeroCuenta, fechaInicio)
-        : '',
-    [numeroCuenta, tipoPrograma, fechaInicio]
+  const folio = useMemo(
+    () => generarFolioExpediente(fechaInicio, siguienteNumeroInicial),
+    [fechaInicio, siguienteNumeroInicial]
   );
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!clave || !fechaTentativa || !edad || !plantelFinal || !carreraFinal) return;
+    if (!folio || !fechaTentativa || !edad || !plantelFinal || !carreraFinal) return;
 
     startTransition(async () => {
       await registrarExpediente({
-        clave,
+        clave: folio,
         nombre,
         apPaterno,
         apMaterno,
@@ -663,14 +664,14 @@ export default function ExpedienteForm({ plantelesIniciales = [] }: ExpedienteFo
         </div>
       </div>
 
-      {/* SECCIÓN 5: TIEMPOS Y CLAVE INSTITUCIONAL */}
+      {/* SECCIÓN 5: TIEMPOS OFICIALES Y FOLIO INSTITUCIONAL */}
       <div className="bg-[#FBF9F5] p-6 rounded-2xl border border-[#E2DACB]">
         <div className="border-b border-[#E2DACB] pb-2 mb-4">
           <h3 className="text-lg font-bold text-[#0A1E42] flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-[#C68A2C] text-white text-xs flex items-center justify-center font-bold">5</span>
-            Tiempos Oficiales y Clave Única
+            Tiempos Oficiales y Folio Institucional
           </h3>
-          <p className="text-xs italic text-[#5C6779] ml-8">Cálculo normativo de 6 meses y generación automática de identificador institucional.</p>
+          <p className="text-xs italic text-[#5C6779] ml-8">Cálculo normativo de 6 meses y generación de folio numérico iterativo de 6 dígitos.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -694,13 +695,16 @@ export default function ExpedienteForm({ plantelesIniciales = [] }: ExpedienteFo
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#0A1E42] uppercase">Clave Única Institucional</label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-[#0A1E42] uppercase">Folio Institucional (6 Dígitos)</label>
+              <span className="text-[10px] text-[#9E6B1D] font-bold bg-[#C68A2C]/15 px-1.5 py-0.5 rounded">Iterativo</span>
+            </div>
             <input
               readOnly
               type="text"
-              value={clave}
-              placeholder="Automático (SS/PP-Cuenta-Fecha)"
-              className="w-full p-2.5 border border-[#C68A2C] rounded-xl text-sm bg-[#C68A2C]/10 text-[#0A1E42] font-mono font-bold cursor-not-allowed"
+              value={folio}
+              placeholder="000000"
+              className="w-full p-2.5 border border-[#C68A2C] rounded-xl text-sm bg-[#C68A2C]/10 text-[#0A1E42] font-mono font-bold tracking-widest cursor-not-allowed"
             />
           </div>
         </div>

@@ -292,7 +292,7 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
           <table className="w-full text-left text-sm">
             <thead className="bg-[#0A1E42] text-xs uppercase text-slate-200 border-b border-[#06132A]">
               <tr>
-                <th className="p-4 tracking-wider">Clave / No. Cuenta</th>
+                <th className="p-4 tracking-wider">Folio / No. Cuenta</th>
                 <th className="p-4 tracking-wider">Alumno</th>
                 <th className="p-4 tracking-wider">Programa</th>
                 <th className="p-4 tracking-wider">Procedencia</th>
