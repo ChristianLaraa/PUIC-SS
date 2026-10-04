@@ -13,7 +13,6 @@ import {
   TrendingUp,
   PlusCircle,
   ExternalLink,
-  Award,
   Globe,
 } from 'lucide-react';
 
@@ -30,16 +29,12 @@ export default async function DashboardPage() {
             <span className="px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#0A1E42] text-white tracking-wider uppercase">
               PUIC - UNAM
             </span>
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#9E6B1D] bg-[#C68A2C]/15 px-2 py-0.5 rounded border border-[#C68A2C]/30">
-              <Award size={12} /> 475 Aniversario
-            </span>
-            <span className="text-xs text-[#5C6779] font-medium hidden sm:inline">• Ciclo Operativo Activo</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#0A1E42] tracking-tight">
-            Panel de Inteligencia Operativa
+            Sistema Operativo de Registros - PUIC
           </h1>
           <p className="text-xs sm:text-sm italic text-[#5C6779] mt-0.5">
-            La UNAM y la pluriculturalidad: seguimiento integral de Servicio Social y Prácticas.
+            La UNAM y la pluriculturalidad: seguimiento integral de Servicio Social y Prácticas Profesionales.
           </p>
         </div>
         <div className="flex items-center gap-2.5">
@@ -66,7 +61,7 @@ export default async function DashboardPage() {
           <span className="text-slate-400 font-normal normal-case text-xs">(Haz clic para filtrar)</span>
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          
+
           {/* Card 1: Activos Totales */}
           <Link
             href="/expedientes?estatus=Activo"
@@ -198,7 +193,7 @@ export default async function DashboardPage() {
 
       {/* SECCIÓN ANALÍTICA: MODALIDADES, PLANTELES Y CARRERAS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Widget 1: Modalidad y Entorno de Trabajo */}
         <div className="bg-white p-6 rounded-2xl border border-[#E2DACB] shadow-xs space-y-4">
           <h3 className="text-sm font-bold text-[#0A1E42] uppercase tracking-wider flex items-center gap-2">

@@ -12,8 +12,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Sistema PUIC de Expedientes | UNAM - 475 Años",
-  description: "Sistema institucional de gestión y seguimiento de expedientes de Servicio Social y Prácticas Profesionales - PUIC UNAM. 475 Aniversario de la Universidad de México.",
+  title: "Sistema PUIC de Expedientes | UNAM",
+  description: "Sistema institucional de gestión y seguimiento de expedientes de Servicio Social y Prácticas Profesionales - PUIC UNAM.",
 };
 
 export default async function RootLayout({

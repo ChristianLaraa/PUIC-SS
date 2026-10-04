@@ -8,7 +8,7 @@ export const GRADOS_ACADEMICOS = [
     'Esp.',
     'C.',
   ];
-  
+
   export const SEMESTRES_UNAM = [
     '6to Semestre',
     '7mo Semestre',
@@ -17,7 +17,7 @@ export const GRADOS_ACADEMICOS = [
     '10mo Semestre',
     'Pasante / Egresado',
   ];
-  
+
   export const CICLOS_ESCOLARES = [
     '2026-1',
     '2026-2',
@@ -25,16 +25,17 @@ export const GRADOS_ACADEMICOS = [
     '2027-2',
     '2028-1',
   ];
-  
+
   export const UBICACIONES_DEPENDENCIA = [
-    'Sede Central PUIC (Loreto)',
-    'Sede Externa (Oaxaca)',
+    'PUIC (Loreto)',
+    'PUIC (Tlalpan)',
+    'PUIC (Oaxaca)',
   ];
-  
+
   export const MODALIDADES = ['Presencial', 'A Distancia', 'Mixta'];
-  
+
   export const TURNOS = ['Matutino', 'Vespertino', 'Mixto'];
-  
+
   export const INSTITUCIONES_DISPONIBLES = [
     'UNAM',
     'Instituto Politécnico Nacional (IPN)',
@@ -95,7 +96,7 @@ export const GRADOS_ACADEMICOS = [
     'Escuela Nacional de Artes Cinematográficas (ENAC)',
     'Escuela Nacional de Enfermería y Obstetricia (ENEO)',
   ];
-  
+
   export const CARRERAS_UNAM = [
     'Actuaría',
     'Administración',

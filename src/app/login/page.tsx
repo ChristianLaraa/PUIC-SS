@@ -121,7 +121,7 @@ export default function LoginPage() {
               <span className="text-[#C68A2C] text-lg font-light">|</span>
               <div className="h-13 w-20 flex items-center justify-center">
                 <Image
-                  src="/puic.png"
+                  src="/puicpng.png"
                   alt="Logo oficial del PUIC - UNAM"
                   width={80}
                   height={44}
@@ -163,7 +163,7 @@ export default function LoginPage() {
           <div className="relative z-10 pt-3 border-t border-[#163670]/60 space-y-2">
             <GrecasMesoamericanas className="text-[#DF9F38]/30" />
             <div className="text-[10px] text-slate-400">
-              <span className="font-semibold text-slate-300">Coordinación de Humanidades</span> • PUIC Digital
+              <span className="font-semibold text-slate-300">Coordinación de Humanidades</span> • PUIC UNAM
               <p className="text-[9px] text-slate-400 mt-0.5">
                 Av. Río Magdalena 100, La Otra Banda, CDMX • nacionmulticultural.unam.mx
               </p>

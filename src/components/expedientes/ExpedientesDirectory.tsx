@@ -8,8 +8,7 @@ import {
   RotateCcw, 
   PlusCircle, 
   ArrowRight, 
-  Filter, 
-  Award
+  Filter
 } from 'lucide-react';
 import { CICLOS_ESCOLARES, MODALIDADES } from '@/lib/constants/catalogos';
 
@@ -116,6 +115,16 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
     filtroPlantel !== 'TODOS' ||
     filtroOrigen !== 'TODOS';
 
+  const filtrosActivosCount = [
+    busqueda !== '',
+    filtroPrograma !== 'TODOS',
+    filtroEstatus !== 'TODOS',
+    filtroCiclo !== 'TODOS',
+    filtroModalidad !== 'TODOS',
+    filtroPlantel !== 'TODOS',
+    filtroOrigen !== 'TODOS',
+  ].filter(Boolean).length;
+
   function resetFiltros() {
     setBusqueda('');
     setFiltroPrograma('TODOS');
@@ -132,8 +141,8 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E2DACB] pb-5">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#9E6B1D] bg-[#C68A2C]/15 px-2 py-0.5 rounded border border-[#C68A2C]/30">
-              <Award size={12} /> PUIC • 475 Años UNAM
+            <span className="inline-flex items-center text-[11px] font-bold text-[#0A1E42] bg-[#0A1E42]/5 px-2.5 py-0.5 rounded border border-[#0A1E42]/10 uppercase tracking-wider">
+              PUIC — UNAM
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#0A1E42] tracking-tight">
@@ -152,31 +161,69 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
         </Link>
       </div>
 
-      {/* Bloque de Búsqueda y Filtros */}
-      <div className="bg-white p-5 rounded-2xl border border-[#E2DACB] shadow-xs space-y-4">
-        {/* Barra de Búsqueda Principal */}
+      {/* Panel Destacado de Búsqueda y Filtros */}
+      <div className="bg-white p-5 sm:p-6 rounded-2xl border-2 border-[#C68A2C]/50 shadow-md ring-1 ring-[#0A1E42]/10 space-y-4.5 relative overflow-hidden">
+        {/* Cabecera del Panel de Filtros para Localización Inmediata */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E2DACB]">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-[#0A1E42] text-[#DF9F38] shadow-xs">
+              <Filter size={18} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xs sm:text-sm font-bold text-[#0A1E42] uppercase tracking-wider">
+                  Panel de Filtros y Búsqueda
+                </h2>
+                {hayFiltrosActivos && (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#C68A2C] text-[#0A1E42] shadow-2xs">
+                    {filtrosActivosCount} activo{filtrosActivosCount > 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-[#5C6779]">
+                Localiza rápidamente por nombre, cuenta, programa institucional o estatus
+              </p>
+            </div>
+          </div>
+
+          {hayFiltrosActivos && (
+            <button
+              onClick={resetFiltros}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 shadow-2xs transition-colors cursor-pointer self-start sm:self-auto"
+            >
+              <RotateCcw size={13} />
+              Restablecer ({filtrosActivosCount})
+            </button>
+          )}
+        </div>
+
+        {/* Barra de Búsqueda Principal Resaltada */}
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#0A1E42]" size={19} />
           <input
             type="text"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Buscar por nombre del alumno, número de cuenta (9 dígitos), clave institucional o carrera..."
-            className="w-full pl-10 pr-4 py-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
+            className="w-full pl-11 pr-4 py-3 border-2 border-[#D5CDBC] rounded-xl text-sm bg-white text-[#0A1E42] placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-[#C68A2C]/20 focus:border-[#0A1E42] outline-none shadow-xs transition-all"
           />
         </div>
 
-        {/* Selectores de Filtro Específico */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
+        {/* Selectores de Filtro Específico con Alto Contraste y Resaltado Activo */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-1">
           {/* Origen Institucional */}
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
-              Origen Institución
+            <label className="text-xs font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
+              Origen
             </label>
             <select
               value={filtroOrigen}
               onChange={(e) => setFiltroOrigen(e.target.value as 'TODOS' | 'UNAM' | 'EXTERNA')}
-              className="w-full p-2 border border-[#E2DACB] rounded-xl text-xs bg-[#FBF9F5] focus:ring-2 focus:ring-[#C68A2C] outline-none"
+              className={`w-full p-2.5 rounded-xl text-xs outline-none transition-all cursor-pointer ${
+                filtroOrigen !== 'TODOS'
+                  ? 'bg-[#C68A2C]/15 border-2 border-[#C68A2C] font-bold text-[#0A1E42] ring-2 ring-[#C68A2C]/20 shadow-xs'
+                  : 'bg-white border-2 border-[#E2DACB] hover:border-[#0A1E42] text-[#0A1E42] font-medium shadow-2xs'
+              }`}
             >
               <option value="TODOS">Todas las instituciones</option>
               <option value="UNAM">Comunidad UNAM</option>
@@ -186,13 +233,17 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
 
           {/* Programa */}
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
+            <label className="text-xs font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
               Programa
             </label>
             <select
               value={filtroPrograma}
               onChange={(e) => setFiltroPrograma(e.target.value)}
-              className="w-full p-2 border border-[#E2DACB] rounded-xl text-xs bg-[#FBF9F5] focus:ring-2 focus:ring-[#C68A2C] outline-none"
+              className={`w-full p-2.5 rounded-xl text-xs outline-none transition-all cursor-pointer ${
+                filtroPrograma !== 'TODOS'
+                  ? 'bg-[#008A7C]/15 border-2 border-[#008A7C] font-bold text-[#008A7C] ring-2 ring-[#008A7C]/20 shadow-xs'
+                  : 'bg-white border-2 border-[#E2DACB] hover:border-[#0A1E42] text-[#0A1E42] font-medium shadow-2xs'
+              }`}
             >
               <option value="TODOS">Todos los programas</option>
               <option value="SS">Servicio Social (SS)</option>
@@ -202,13 +253,17 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
 
           {/* Estatus */}
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
+            <label className="text-xs font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
               Estatus
             </label>
             <select
               value={filtroEstatus}
               onChange={(e) => setFiltroEstatus(e.target.value)}
-              className="w-full p-2 border border-[#E2DACB] rounded-xl text-xs bg-[#FBF9F5] focus:ring-2 focus:ring-[#C68A2C] outline-none"
+              className={`w-full p-2.5 rounded-xl text-xs outline-none transition-all cursor-pointer ${
+                filtroEstatus !== 'TODOS'
+                  ? 'bg-[#0A1E42]/10 border-2 border-[#0A1E42] font-bold text-[#0A1E42] ring-2 ring-[#0A1E42]/20 shadow-xs'
+                  : 'bg-white border-2 border-[#E2DACB] hover:border-[#0A1E42] text-[#0A1E42] font-medium shadow-2xs'
+              }`}
             >
               <option value="TODOS">Todos los estatus</option>
               <option value="Activo">Activos</option>
@@ -219,13 +274,17 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
 
           {/* Ciclo Escolar */}
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
+            <label className="text-xs font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
               Ciclo Escolar
             </label>
             <select
               value={filtroCiclo}
               onChange={(e) => setFiltroCiclo(e.target.value)}
-              className="w-full p-2 border border-[#E2DACB] rounded-xl text-xs bg-[#FBF9F5] focus:ring-2 focus:ring-[#C68A2C] outline-none"
+              className={`w-full p-2.5 rounded-xl text-xs outline-none transition-all cursor-pointer ${
+                filtroCiclo !== 'TODOS'
+                  ? 'bg-[#C68A2C]/15 border-2 border-[#C68A2C] font-bold text-[#0A1E42] ring-2 ring-[#C68A2C]/20 shadow-xs'
+                  : 'bg-white border-2 border-[#E2DACB] hover:border-[#0A1E42] text-[#0A1E42] font-medium shadow-2xs'
+              }`}
             >
               <option value="TODOS">Todos los ciclos</option>
               {CICLOS_ESCOLARES.map((c) => (
@@ -236,13 +295,17 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
 
           {/* Modalidad */}
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
+            <label className="text-xs font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
               Modalidad
             </label>
             <select
               value={filtroModalidad}
               onChange={(e) => setFiltroModalidad(e.target.value)}
-              className="w-full p-2 border border-[#E2DACB] rounded-xl text-xs bg-[#FBF9F5] focus:ring-2 focus:ring-[#C68A2C] outline-none"
+              className={`w-full p-2.5 rounded-xl text-xs outline-none transition-all cursor-pointer ${
+                filtroModalidad !== 'TODOS'
+                  ? 'bg-[#C68A2C]/15 border-2 border-[#C68A2C] font-bold text-[#0A1E42] ring-2 ring-[#C68A2C]/20 shadow-xs'
+                  : 'bg-white border-2 border-[#E2DACB] hover:border-[#0A1E42] text-[#0A1E42] font-medium shadow-2xs'
+              }`}
             >
               <option value="TODOS">Todas las modalidades</option>
               {MODALIDADES.map((m) => (
@@ -253,13 +316,17 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
 
           {/* Plantel */}
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
+            <label className="text-xs font-bold uppercase tracking-wider text-[#0A1E42] block mb-1">
               Plantel / Escuela
             </label>
             <select
               value={filtroPlantel}
               onChange={(e) => setFiltroPlantel(e.target.value)}
-              className="w-full p-2 border border-[#E2DACB] rounded-xl text-xs bg-[#FBF9F5] focus:ring-2 focus:ring-[#C68A2C] outline-none truncate"
+              className={`w-full p-2.5 rounded-xl text-xs outline-none transition-all cursor-pointer truncate ${
+                filtroPlantel !== 'TODOS'
+                  ? 'bg-[#C68A2C]/15 border-2 border-[#C68A2C] font-bold text-[#0A1E42] ring-2 ring-[#C68A2C]/20 shadow-xs'
+                  : 'bg-white border-2 border-[#E2DACB] hover:border-[#0A1E42] text-[#0A1E42] font-medium shadow-2xs'
+              }`}
             >
               <option value="TODOS">Todos los planteles</option>
               {plantelesDisponibles.map((p) => (
@@ -270,17 +337,17 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
         </div>
 
         {/* Barra de Estado de Filtros */}
-        <div className="flex items-center justify-between pt-2 border-t border-[#E2DACB]/60 text-xs text-[#5C6779]">
-          <span>
-            Mostrando <strong>{expedientesFiltrados.length}</strong> de <strong>{expedientes.length}</strong> expedientes registrados
+        <div className="flex items-center justify-between pt-3 border-t border-[#E2DACB] text-xs text-[#5C6779]">
+          <span className="font-medium">
+            Mostrando <strong className="text-[#0A1E42] font-bold">{expedientesFiltrados.length}</strong> de <strong className="text-[#0A1E42] font-bold">{expedientes.length}</strong> expedientes registrados
           </span>
           {hayFiltrosActivos && (
             <button
               onClick={resetFiltros}
-              className="inline-flex items-center gap-1.5 text-[#0A1E42] hover:text-[#C68A2C] font-semibold transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-rose-700 hover:text-rose-900 font-bold transition-colors cursor-pointer"
             >
               <RotateCcw size={13} />
-              Restablecer filtros
+              Limpiar todos los filtros
             </button>
           )}
         </div>
