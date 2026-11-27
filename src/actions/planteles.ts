@@ -19,28 +19,34 @@ export async function getPlanteles() {
 }
 
 export async function getPlantelesStats() {
-  const [totalPlanteles, totalUnam, totalExternos, planteles] = await Promise.all([
-    prisma.plantel.count(),
-    prisma.plantel.count({ where: { esUnam: true } }),
-    prisma.plantel.count({ where: { esUnam: false } }),
-    prisma.plantel.findMany({
-      include: {
-        _count: {
-          select: { expedientes: true },
+  const [totalPlanteles, totalUnam, totalExternos, totalActivos, totalInactivos, planteles] =
+    await Promise.all([
+      prisma.plantel.count(),
+      prisma.plantel.count({ where: { esUnam: true } }),
+      prisma.plantel.count({ where: { esUnam: false } }),
+      prisma.plantel.count({ where: { activo: true } }),
+      prisma.plantel.count({ where: { activo: false } }),
+      prisma.plantel.findMany({
+        include: {
+          _count: {
+            select: { expedientes: true },
+          },
         },
-      },
-      orderBy: [
-        { esUnam: 'desc' },
-        { institucion: 'asc' },
-        { nombre: 'asc' },
-      ],
-    }),
-  ]);
+        orderBy: [
+          { activo: 'desc' },
+          { esUnam: 'desc' },
+          { institucion: 'asc' },
+          { nombre: 'asc' },
+        ],
+      }),
+    ]);
 
   return {
     totalPlanteles,
     totalUnam,
     totalExternos,
+    totalActivos,
+    totalInactivos,
     planteles,
   };
 }
@@ -61,12 +67,14 @@ export async function crearPlantel(data: {
       siglas: data.siglas?.trim() || null,
       institucion: institucionLimpia,
       esUnam,
+      activo: true,
     },
     create: {
       nombre: nombreLimpio,
       siglas: data.siglas?.trim() || null,
       institucion: institucionLimpia,
       esUnam,
+      activo: true,
     },
   });
 
@@ -76,6 +84,20 @@ export async function crearPlantel(data: {
   revalidatePath('/');
 
   return nuevo;
+}
+
+export async function cambiarEstadoPlantel(idPlantel: number, activo: boolean) {
+  const actualizado = await prisma.plantel.update({
+    where: { idPlantel },
+    data: { activo },
+  });
+
+  revalidatePath('/planteles');
+  revalidatePath('/expedientes');
+  revalidatePath('/expedientes/nuevo');
+  revalidatePath('/');
+
+  return actualizado;
 }
 
 export async function actualizarPlantel(

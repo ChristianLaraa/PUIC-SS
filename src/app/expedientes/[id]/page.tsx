@@ -8,18 +8,11 @@ import {
   User,
   Mail,
   Phone,
-  Building2,
   GraduationCap,
   Briefcase,
-  Clock,
-  Calendar,
   MapPin,
-  Sun,
-  BookOpen,
-  Hash,
-  Compass,
 } from 'lucide-react';
-import { obtenerDiasRestantes } from '@/lib/helpers';
+import { obtenerDiasRestantes, describirPlazoPrograma } from '@/lib/helpers';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -53,7 +46,8 @@ export default async function ExpedienteDetallePage({ params }: PageProps) {
       ? 'Mujer'
       : 'Otro';
 
-  const { dias, esCritico } = obtenerDiasRestantes(expediente.fechaTentativa);
+  const { dias } = obtenerDiasRestantes(expediente.fechaTentativa);
+  const plazoTexto = describirPlazoPrograma(expediente.tipoPrograma, expediente.horasRequeridas);
 
   return (
     <div className="space-y-6 pb-12">
@@ -77,7 +71,10 @@ export default async function ExpedienteDetallePage({ params }: PageProps) {
             </span>
           </div>
           <p className="text-xs sm:text-sm text-[#5C6779] mt-0.5">
-            {expediente.tipoPrograma === 'SS' ? 'Servicio Social' : 'Prácticas Profesionales'} • {expediente.carrera?.nombre}
+            {expediente.tipoPrograma === 'SS'
+              ? 'Servicio Social (480 hrs)'
+              : `Prácticas Profesionales (${expediente.horasRequeridas ?? 480} hrs)`}{' '}
+            • {expediente.carrera?.nombre}
           </p>
         </div>
         <Link
@@ -128,7 +125,9 @@ export default async function ExpedienteDetallePage({ params }: PageProps) {
             <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#E2DACB]/60">
               <div>
                 <span className="text-[11px] font-bold text-[#5C6779] block">Edad</span>
-                <p className="font-semibold text-[#0E1B2E] mt-0.5">{expediente.edad} años</p>
+                <p className="font-semibold text-[#0E1B2E] mt-0.5">
+                  {expediente.edad ? `${expediente.edad} años` : 'No registrada'}
+                </p>
               </div>
               <div>
                 <span className="text-[11px] font-bold text-[#5C6779] block">Sexo</span>
@@ -178,12 +177,23 @@ export default async function ExpedienteDetallePage({ params }: PageProps) {
               <p className="font-semibold text-[#0E1B2E] mt-0.5">{expediente.carrera?.nombre}</p>
             </div>
             <div className="pt-2 border-t border-[#E2DACB]/60">
-              <span className="text-[11px] font-bold text-[#5C6779] block">Coordinador / Tutor PUIC</span>
+              <span className="text-[11px] font-bold text-[#5C6779] block">Responsable Directo / Coordinador PUIC</span>
               <p className="font-semibold text-[#0A1E42] mt-0.5">
                 <span className="text-[#9E6B1D] font-bold">{expediente.coordinador?.gradoAcademico} </span>
                 {expediente.coordinador?.nombreCompleto}
               </p>
             </div>
+            {expediente.supervisorNombre && (
+              <div className="pt-2 border-t border-[#E2DACB]/60">
+                <span className="text-[11px] font-bold text-[#5C6779] block">Bajo la supervisión de</span>
+                <p className="font-semibold text-[#0A1E42] mt-0.5">
+                  {expediente.supervisorGrado && (
+                    <span className="text-[#008A7C] font-bold">{expediente.supervisorGrado} </span>
+                  )}
+                  {expediente.supervisorNombre}
+                </p>
+              </div>
+            )}
             <div className="pt-2 border-t border-[#E2DACB]/60">
               <span className="text-[11px] font-bold text-[#5C6779] block">Sede / Ubicación de Asignación</span>
               <p className="font-semibold text-[#0E1B2E] mt-0.5 flex items-center gap-1">
@@ -237,7 +247,7 @@ export default async function ExpedienteDetallePage({ params }: PageProps) {
                 </p>
               </div>
               <div>
-                <span className="text-[11px] font-bold text-[#5C6779] block">Término Tentativo (+6m)</span>
+                <span className="text-[11px] font-bold text-[#5C6779] block">Término Tentativo ({plazoTexto})</span>
                 <p className="font-bold text-[#0A1E42] mt-0.5">
                   {new Date(expediente.fechaTentativa).toLocaleDateString('es-MX', { timeZone: 'UTC' })}
                 </p>
@@ -252,7 +262,7 @@ export default async function ExpedienteDetallePage({ params }: PageProps) {
                 </div>
               ) : dias < 0 ? (
                 <div className="p-2 rounded-lg bg-rose-50 text-rose-800 font-bold text-[11px] border border-rose-200">
-                  ⚠ El plazo de 6 meses concluyó hace {Math.abs(dias)} días
+                  ⚠ El plazo reglamentario ({plazoTexto}) concluyó hace {Math.abs(dias)} días
                 </div>
               ) : (
                 <div className="p-2 rounded-lg bg-amber-50 text-[#9E6B1D] font-bold text-[11px] border border-amber-200 flex items-center justify-between">

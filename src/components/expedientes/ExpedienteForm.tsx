@@ -2,9 +2,15 @@
 
 import { useMemo, useState, useTransition } from 'react';
 import { registrarExpediente } from '@/actions/expedientes';
-import { generarFolioExpediente, calcularFechaTentativa } from '@/lib/helpers';
+import {
+  generarFolioExpediente,
+  calcularFechaTentativa,
+  describirPlazoPrograma,
+  esFinDeSemana,
+} from '@/lib/helpers';
 import {
   GRADOS_ACADEMICOS,
+  HORAS_PRACTICAS_PROFESIONALES,
   SEMESTRES_UNAM,
   CICLOS_ESCOLARES,
   UBICACIONES_DEPENDENCIA,
@@ -15,7 +21,8 @@ import {
   INSTITUCIONES_DISPONIBLES,
   PLANTELES_EXTERNOS_SUGERIDOS,
 } from '@/lib/constants/catalogos';
-import { School, Globe, PlusCircle, CheckCircle2, AlertCircle } from 'lucide-react';
+import WeekdayDatePicker from '@/components/ui/WeekdayDatePicker';
+import { School, Globe, PlusCircle, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
 
 interface PlantelItem {
   idPlantel: number;
@@ -23,6 +30,7 @@ interface PlantelItem {
   siglas?: string | null;
   institucion: string;
   esUnam: boolean;
+  activo?: boolean;
 }
 
 interface ExpedienteFormProps {
@@ -30,11 +38,85 @@ interface ExpedienteFormProps {
   siguienteNumeroInicial?: number;
 }
 
+function formatearFechaLarga(iso: string): string {
+  if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return '';
+  const [y, m, d] = iso.split('-').map(Number);
+  const fecha = new Date(y, m - 1, d);
+  return fecha.toLocaleDateString('es-MX', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
 export default function ExpedienteForm({
   plantelesIniciales = [],
   siguienteNumeroInicial = 14,
 }: ExpedienteFormProps) {
   const [isPending, startTransition] = useTransition();
+  const [errorFormulario, setErrorFormulario] = useState<string | null>(null);
+
+  // Planteles inactivos registrados en BD (para respetarlos en las listas)
+  const nombresInactivos = useMemo(
+    () =>
+      new Set(
+        plantelesIniciales
+          .filter((p) => p.activo === false)
+          .map((p) => p.nombre.toLowerCase())
+      ),
+    [plantelesIniciales]
+  );
+
+  // Lista combinada de planteles UNAM activos (catálogo base + BD)
+  const plantelesUnamDisponibles = useMemo(() => {
+    const lista = PLANTELES_UNAM.filter((p) => !nombresInactivos.has(p.toLowerCase()));
+    plantelesIniciales
+      .filter((p) => p.esUnam && p.activo !== false)
+      .forEach((dbP) => {
+        if (!lista.some((t) => t.toLowerCase() === dbP.nombre.toLowerCase())) {
+          lista.push(dbP.nombre);
+        }
+      });
+    return lista.length > 0 ? lista : PLANTELES_UNAM;
+  }, [plantelesIniciales, nombresInactivos]);
+
+  // Lista combinada de instituciones externas disponibles
+  const institucionesExternasDisponibles = useMemo(() => {
+    const base = INSTITUCIONES_DISPONIBLES.filter((i) => i !== 'UNAM' && i !== 'Otra Institución');
+    const extras: string[] = [];
+    plantelesIniciales
+      .filter((p) => !p.esUnam && p.activo !== false && p.institucion)
+      .forEach((p) => {
+        if (
+          p.institucion !== 'UNAM' &&
+          p.institucion !== 'Otra Institución' &&
+          !base.some((b) => b.toLowerCase() === p.institucion.toLowerCase()) &&
+          !extras.some((e) => e.toLowerCase() === p.institucion.toLowerCase())
+        ) {
+          extras.push(p.institucion);
+        }
+      });
+    return [...base, ...extras, 'Otra Institución'];
+  }, [plantelesIniciales]);
+
+  // Lista combinada de escuelas externas activas (sugeridas + registradas en BD)
+  const escuelasExternasDisponibles = useMemo(() => {
+    const externasDb = plantelesIniciales
+      .filter((p) => !p.esUnam && p.activo !== false)
+      .map((p) => ({ nombre: p.nombre, institucion: p.institucion, siglas: p.siglas || '' }));
+
+    const todas = PLANTELES_EXTERNOS_SUGERIDOS.filter(
+      (p) => !nombresInactivos.has(p.nombre.toLowerCase())
+    );
+    externasDb.forEach((dbP) => {
+      if (!todas.some((t) => t.nombre.toLowerCase() === dbP.nombre.toLowerCase())) {
+        todas.push(dbP);
+      }
+    });
+
+    return todas.length > 0 ? todas : PLANTELES_EXTERNOS_SUGERIDOS;
+  }, [plantelesIniciales, nombresInactivos]);
 
   // 1. Datos Personales y de Contacto
   const [nombre, setNombre] = useState('');
@@ -49,22 +131,27 @@ export default function ExpedienteForm({
 
   // 2. Origen Institucional y Adscripción Académica
   const [esUnam, setEsUnam] = useState(true);
-  
+
   // UNAM
-  const [plantelUnam, setPlantelUnam] = useState(PLANTELES_UNAM[0]);
+  const [plantelUnam, setPlantelUnam] = useState(() => plantelesUnamDisponibles[0]);
   const [carreraUnam, setCarreraUnam] = useState(CARRERAS_UNAM[0]);
 
   // NO UNAM / Externa
-  const [institucionExterna, setInstitucionExterna] = useState(INSTITUCIONES_DISPONIBLES[1]); // IPN por defecto
+  const [institucionExterna, setInstitucionExterna] = useState(
+    () => institucionesExternasDisponibles[0]
+  );
   const [otraInstitucionNombre, setOtraInstitucionNombre] = useState('');
   const [modoEscuelaExterna, setModoEscuelaExterna] = useState<'catalogo' | 'nueva'>('catalogo');
-  const [plantelExternoSeleccionado, setPlantelExternoSeleccionado] = useState(PLANTELES_EXTERNOS_SUGERIDOS[0].nombre);
+  const [plantelExternoSeleccionado, setPlantelExternoSeleccionado] = useState(
+    () => escuelasExternasDisponibles[0].nombre
+  );
   const [nuevoPlantelNombre, setNuevoPlantelNombre] = useState('');
   const [nuevoPlantelSiglas, setNuevoPlantelSiglas] = useState('');
   const [carreraExterna, setCarreraExterna] = useState('');
 
   // 3. Datos del Programa
   const [tipoPrograma, setTipoPrograma] = useState<'SS' | 'PP'>('SS');
+  const [horasPracticas, setHorasPracticas] = useState<240 | 360 | 480>(480);
   const [clavePrograma, setClavePrograma] = useState('');
   const [nombrePrograma, setNombrePrograma] = useState('');
   const [cicloEscolar, setCicloEscolar] = useState(CICLOS_ESCOLARES[0]);
@@ -72,12 +159,17 @@ export default function ExpedienteForm({
   const [modalidad, setModalidad] = useState(MODALIDADES[0]);
   const [turno, setTurno] = useState(TURNOS[0]);
 
-  // 4. Coordinador / Responsable
+  // 4. Coordinador / Responsable Directo y Bajo la supervisión de
   const [coordinadorGrado, setCoordinadorGrado] = useState(GRADOS_ACADEMICOS[0]);
   const [coordinadorNombre, setCoordinadorNombre] = useState('');
+  const [supervisorGrado, setSupervisorGrado] = useState('');
+  const [supervisorNombre, setSupervisorNombre] = useState('');
 
   // 5. Tiempos y Clave Institucional
   const [fechaInicio, setFechaInicio] = useState('');
+
+  // Horas efectivas del programa
+  const horasEfectivas = tipoPrograma === 'SS' ? 480 : horasPracticas;
 
   // Resolver nombre de institución final
   const institucionFinal = useMemo(() => {
@@ -103,9 +195,17 @@ export default function ExpedienteForm({
     if (modoEscuelaExterna === 'nueva') {
       return nuevoPlantelSiglas.trim() || null;
     }
-    const sugerido = PLANTELES_EXTERNOS_SUGERIDOS.find((p) => p.nombre === plantelExternoSeleccionado);
+    const sugerido = escuelasExternasDisponibles.find(
+      (p) => p.nombre === plantelExternoSeleccionado
+    );
     return sugerido?.siglas || null;
-  }, [esUnam, modoEscuelaExterna, nuevoPlantelSiglas, plantelExternoSeleccionado]);
+  }, [
+    esUnam,
+    modoEscuelaExterna,
+    nuevoPlantelSiglas,
+    plantelExternoSeleccionado,
+    escuelasExternasDisponibles,
+  ]);
 
   // Resolver carrera final
   const carreraFinal = useMemo(() => {
@@ -113,26 +213,13 @@ export default function ExpedienteForm({
     return carreraExterna.trim() || 'Sin carrera especificada';
   }, [esUnam, carreraUnam, carreraExterna]);
 
-  // Lista combinada de escuelas externas (sugeridas + registradas en base de datos)
-  const escuelasExternasDisponibles = useMemo(() => {
-    const externasDb = plantelesIniciales
-      .filter((p) => !p.esUnam)
-      .map((p) => ({ nombre: p.nombre, institucion: p.institucion, siglas: p.siglas || '' }));
-
-    const todas = [...PLANTELES_EXTERNOS_SUGERIDOS];
-    externasDb.forEach((dbP) => {
-      if (!todas.some((t) => t.nombre.toLowerCase() === dbP.nombre.toLowerCase())) {
-        todas.push(dbP);
-      }
-    });
-
-    return todas;
-  }, [plantelesIniciales]);
-
-  // Valores derivados: cálculo de término y folio oficial iterativo de 6 dígitos
+  // Valores derivados: cálculo de término proporcional a las horas y folio oficial iterativo de 6 dígitos
   const fechaTentativa = useMemo(
-    () => (fechaInicio ? calcularFechaTentativa(fechaInicio) : ''),
-    [fechaInicio]
+    () =>
+      fechaInicio
+        ? calcularFechaTentativa(fechaInicio, tipoPrograma, horasEfectivas)
+        : '',
+    [fechaInicio, tipoPrograma, horasEfectivas]
   );
 
   const folio = useMemo(
@@ -140,45 +227,80 @@ export default function ExpedienteForm({
     [fechaInicio, siguienteNumeroInicial]
   );
 
+  const etiquetaPlazo = useMemo(
+    () => describirPlazoPrograma(tipoPrograma, horasEfectivas),
+    [tipoPrograma, horasEfectivas]
+  );
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!folio || !fechaTentativa || !edad || !plantelFinal || !carreraFinal) return;
+    setErrorFormulario(null);
+
+    if (!fechaInicio) {
+      setErrorFormulario('Debes seleccionar una Fecha de Inicio Oficial (lunes a viernes).');
+      return;
+    }
+
+    if (esFinDeSemana(fechaInicio)) {
+      setErrorFormulario('No se permiten sábados ni domingos como fecha de inicio.');
+      return;
+    }
+
+    if (!folio || !fechaTentativa || !plantelFinal || !carreraFinal) {
+      setErrorFormulario('Completa los campos obligatorios antes de registrar el expediente.');
+      return;
+    }
 
     startTransition(async () => {
-      await registrarExpediente({
-        clave: folio,
-        nombre,
-        apPaterno,
-        apMaterno,
-        numeroCuenta,
-        correoElectronico,
-        telefono,
-        edad: Number(edad),
-        sexo,
-        semestre,
-        plantelNombre: plantelFinal,
-        plantelInstitucion: institucionFinal,
-        esUnam,
-        plantelSiglas: siglasFinal || undefined,
-        carreraNombre: carreraFinal,
-        tipoPrograma,
-        clavePrograma,
-        nombrePrograma,
-        cicloEscolar,
-        ubicacionDependencia,
-        modalidad,
-        turno,
-        coordinadorGrado,
-        coordinadorNombre,
-        fechaInicio,
-        fechaTentativa,
-      });
+      try {
+        await registrarExpediente({
+          clave: folio,
+          nombre,
+          apPaterno,
+          apMaterno,
+          numeroCuenta,
+          correoElectronico,
+          telefono,
+          edad: edad === '' ? null : Number(edad),
+          sexo,
+          semestre,
+          plantelNombre: plantelFinal,
+          plantelInstitucion: institucionFinal,
+          esUnam,
+          plantelSiglas: siglasFinal || undefined,
+          carreraNombre: carreraFinal,
+          tipoPrograma,
+          horasRequeridas: horasEfectivas,
+          clavePrograma,
+          nombrePrograma,
+          cicloEscolar,
+          ubicacionDependencia,
+          modalidad,
+          turno,
+          coordinadorGrado,
+          coordinadorNombre,
+          supervisorGrado: supervisorNombre.trim() ? supervisorGrado || null : null,
+          supervisorNombre: supervisorNombre.trim() || null,
+          fechaInicio,
+          fechaTentativa,
+        });
+      } catch (err: unknown) {
+        if (err instanceof Error && !err.message.includes('NEXT_REDIRECT')) {
+          setErrorFormulario(err.message);
+        }
+      }
     });
   }
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-2xl border border-[#E2DACB] shadow-xs space-y-8">
-      
+      {errorFormulario && (
+        <div className="bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl text-xs font-semibold flex items-center gap-2.5">
+          <AlertCircle size={16} className="shrink-0 text-rose-600" />
+          <span>{errorFormulario}</span>
+        </div>
+      )}
+
       {/* SECCIÓN 1: DATOS DEL ALUMNO Y CONTACTO */}
       <div>
         <div className="border-b border-[#E2DACB] pb-2 mb-4">
@@ -226,18 +348,18 @@ export default function ExpedienteForm({
 
           <div className="space-y-1">
             <label className="text-xs font-bold text-[#0A1E42] uppercase">
-              {esUnam ? 'Número de Cuenta UNAM (9 dígitos) *' : 'Matrícula / Boleta / No. Cuenta *'}
+              {esUnam ? 'Núm. de Cuenta / Matrícula *' : 'Matrícula / Boleta / Núm. de Cuenta *'}
             </label>
             <input
               required
               type="text"
-              maxLength={esUnam ? 9 : 20}
+              maxLength={20}
               value={numeroCuenta}
               onChange={(e) => {
-                const val = esUnam ? e.target.value.replace(/\D/g, '') : e.target.value.trim();
+                const val = e.target.value.replace(/[^a-zA-Z0-9-]/g, '');
                 setNumeroCuenta(val);
               }}
-              placeholder={esUnam ? '318123456' : 'Ej. 2021640192 o MAT-4590'}
+              placeholder={esUnam ? 'Ej. 318123456 o A31812345' : 'Ej. 2021640192 o MAT-4590'}
               className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none font-mono font-semibold transition-all"
             />
           </div>
@@ -265,15 +387,16 @@ export default function ExpedienteForm({
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#0A1E42] uppercase">Edad *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">
+              Edad <span className="text-[#5C6779] font-normal normal-case">(Opcional)</span>
+            </label>
             <input
-              required
               type="number"
-              min={17}
+              min={15}
               max={99}
               value={edad}
               onChange={(e) => setEdad(e.target.value === '' ? '' : Number(e.target.value))}
-              placeholder="22"
+              placeholder="Ej. 22 (Opcional)"
               className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             />
           </div>
@@ -359,7 +482,7 @@ export default function ExpedienteForm({
                 onChange={(e) => setPlantelUnam(e.target.value)}
                 className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
               >
-                {PLANTELES_UNAM.map((plantel) => (
+                {plantelesUnamDisponibles.map((plantel) => (
                   <option key={plantel} value={plantel}>{plantel}</option>
                 ))}
               </select>
@@ -381,7 +504,7 @@ export default function ExpedienteForm({
         ) : (
           /* CONTENIDO SI ES NO UNAM / EXTERNA */
           <div className="space-y-4 bg-emerald-50/40 p-4 sm:p-5 rounded-xl border border-emerald-200">
-            <div className="flex items-center justify-between pb-2 border-b border-emerald-200/60">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2 border-b border-emerald-200/60">
               <div className="flex items-center gap-2">
                 <span className="p-1 rounded bg-[#008A7C] text-white">
                   <Globe size={15} />
@@ -428,7 +551,7 @@ export default function ExpedienteForm({
                   onChange={(e) => setInstitucionExterna(e.target.value)}
                   className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-white focus:ring-2 focus:ring-[#008A7C] focus:border-[#0A1E42] outline-none transition-all"
                 >
-                  {INSTITUCIONES_DISPONIBLES.filter((i) => i !== 'UNAM').map((inst) => (
+                  {institucionesExternasDisponibles.map((inst) => (
                     <option key={inst} value={inst}>{inst}</option>
                   ))}
                 </select>
@@ -465,7 +588,7 @@ export default function ExpedienteForm({
                     ))}
                   </select>
                   <p className="text-[11px] text-[#5C6779] mt-0.5">
-                    ¿No encuentras tu escuela? Haz clic en <span className="font-bold text-[#008A7C]">"Ingresar Nueva Escuela"</span> arriba para registrarla.
+                    ¿No encuentras tu escuela? Haz clic en <span className="font-bold text-[#008A7C]">&quot;Ingresar Nueva Escuela&quot;</span> arriba o adminístralas en el módulo <strong>Instituciones y Escuelas</strong>.
                   </p>
                 </div>
               ) : (
@@ -552,17 +675,40 @@ export default function ExpedienteForm({
               <option value="PP">Prácticas Profesionales (PP)</option>
             </select>
           </div>
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-[#0A1E42] uppercase">Clave de Programa (SIASS/DGOAE) *</label>
-            <input
-              required
-              type="text"
-              value={clavePrograma}
-              onChange={(e) => setClavePrograma(e.target.value)}
-              placeholder="Ej. 2026-12/45-1234"
-              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all font-mono"
-            />
-          </div>
+
+          {tipoPrograma === 'PP' ? (
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#9E6B1D] uppercase flex items-center gap-1">
+                <Clock size={13} className="text-[#C68A2C]" />
+                Horas de Prácticas (P.P.) *
+              </label>
+              <select
+                value={horasPracticas}
+                onChange={(e) => setHorasPracticas(Number(e.target.value) as 240 | 360 | 480)}
+                className="w-full p-2.5 border-2 border-[#C68A2C]/60 rounded-xl text-sm bg-[#C68A2C]/10 focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none font-bold text-[#0A1E42] transition-all"
+              >
+                {HORAS_PRACTICAS_PROFESIONALES.map((opt) => (
+                  <option key={opt.horas} value={opt.horas}>
+                    {opt.etiqueta}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#5C6779] uppercase flex items-center gap-1">
+                <Clock size={13} className="text-[#008A7C]" />
+                Horas Reglamentarias
+              </label>
+              <input
+                readOnly
+                type="text"
+                value="480 hrs (6 meses)"
+                className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-slate-100 text-slate-600 font-semibold cursor-not-allowed"
+              />
+            </div>
+          )}
+
           <div className="space-y-1">
             <label className="text-xs font-bold text-[#0A1E42] uppercase">Ciclo Escolar *</label>
             <select
@@ -576,7 +722,19 @@ export default function ExpedienteForm({
             </select>
           </div>
 
-          <div className="md:col-span-3 space-y-1">
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Clave de Programa (SIASS/DGOAE) *</label>
+            <input
+              required
+              type="text"
+              value={clavePrograma}
+              onChange={(e) => setClavePrograma(e.target.value)}
+              placeholder="Ej. 2026-12/45-1234"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all font-mono"
+            />
+          </div>
+
+          <div className="md:col-span-2 space-y-1">
             <label className="text-xs font-bold text-[#0A1E42] uppercase">Nombre Oficial del Programa *</label>
             <input
               required
@@ -627,16 +785,17 @@ export default function ExpedienteForm({
         </div>
       </div>
 
-      {/* SECCIÓN 4: COORDINADOR / RESPONSABLE */}
-      <div>
-        <div className="border-b border-[#E2DACB] pb-2 mb-4">
+      {/* SECCIÓN 4: COORDINADOR / RESPONSABLE DIRECTO Y SUPERVISIÓN */}
+      <div className="space-y-5">
+        <div className="border-b border-[#E2DACB] pb-2">
           <h3 className="text-lg font-bold text-[#0A1E42] flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-[#0A1E42] text-white text-xs flex items-center justify-center font-bold">4</span>
             Responsable Directo / Coordinador PUIC
           </h3>
-          <p className="text-xs italic text-[#5C6779] ml-8">Académico o funcionario que supervisará las actividades.</p>
+          <p className="text-xs italic text-[#5C6779] ml-8">Académico o funcionario responsable y supervisión directa de actividades.</p>
         </div>
 
+        {/* Responsable Directo */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-1">
             <label className="text-xs font-bold text-[#0A1E42] uppercase">Grado Académico *</label>
@@ -651,7 +810,7 @@ export default function ExpedienteForm({
             </select>
           </div>
           <div className="md:col-span-3 space-y-1">
-            <label className="text-xs font-bold text-[#0A1E42] uppercase">Nombre Completo del Coordinador *</label>
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Nombre Completo del Responsable Directo *</label>
             <input
               required
               type="text"
@@ -660,6 +819,48 @@ export default function ExpedienteForm({
               placeholder="Ej. Roberto Sánchez Morales"
               className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-[#FBF9F5] focus:bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
             />
+          </div>
+        </div>
+
+        {/* Bajo la supervisión de (Opcional) */}
+        <div className="p-4 sm:p-5 rounded-xl border border-[#E2DACB] bg-[#FBF9F5]/80 space-y-3">
+          <div>
+            <h4 className="text-xs font-bold text-[#0A1E42] uppercase tracking-wide">
+              Bajo la supervisión de:{' '}
+              <span className="text-[#5C6779] font-normal normal-case">(Opcional)</span>
+            </h4>
+            <p className="text-[11px] text-[#5C6779] mt-0.5">
+              Indica el grado y nombre de la persona que supervisará directamente al alumno, si es distinta al responsable directo.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#0A1E42] uppercase">
+                Grado <span className="text-[#5C6779] font-normal normal-case">(Opcional)</span>
+              </label>
+              <select
+                value={supervisorGrado}
+                onChange={(e) => setSupervisorGrado(e.target.value)}
+                className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
+              >
+                <option value="">Sin especificar</option>
+                {GRADOS_ACADEMICOS.map((g) => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+            </div>
+            <div className="md:col-span-3 space-y-1">
+              <label className="text-xs font-bold text-[#0A1E42] uppercase">
+                Nombre Completo <span className="text-[#5C6779] font-normal normal-case">(Opcional)</span>
+              </label>
+              <input
+                type="text"
+                value={supervisorNombre}
+                onChange={(e) => setSupervisorNombre(e.target.value)}
+                placeholder="Ej. Ana María Gómez Ruiz"
+                className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-white focus:ring-2 focus:ring-[#C68A2C] focus:border-[#0A1E42] outline-none transition-all"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -671,27 +872,35 @@ export default function ExpedienteForm({
             <span className="w-6 h-6 rounded-full bg-[#C68A2C] text-white text-xs flex items-center justify-center font-bold">5</span>
             Tiempos Oficiales y Folio Institucional
           </h3>
-          <p className="text-xs italic text-[#5C6779] ml-8">Cálculo normativo de 6 meses y generación de folio numérico iterativo de 6 dígitos.</p>
+          <p className="text-xs italic text-[#5C6779] ml-8">
+            Cálculo normativo ({etiquetaPlazo}, ajustando al lunes siguiente si cae en fin de semana). Sábados y domingos bloqueados.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#0A1E42] uppercase">Fecha de Inicio Oficial *</label>
-            <input
+            <label className="text-xs font-bold text-[#0A1E42] uppercase">Fecha de Inicio Oficial (L–V) *</label>
+            <WeekdayDatePicker
+              id="fecha-inicio-oficial"
               required
-              type="date"
               value={fechaInicio}
-              onChange={(e) => setFechaInicio(e.target.value)}
-              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-white focus:ring-2 focus:ring-[#C68A2C] outline-none transition-all"
+              onChange={(val) => {
+                setFechaInicio(val);
+                setErrorFormulario(null);
+              }}
+              placeholder="Selecciona día hábil (L–V)"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#5C6779] uppercase">Fecha Tentativa (+6 Meses)</label>
+            <label className="text-xs font-bold text-[#5C6779] uppercase">
+              Fecha Tentativa ({etiquetaPlazo})
+            </label>
             <input
               readOnly
-              type="date"
-              value={fechaTentativa}
-              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-slate-100 text-slate-600 font-medium cursor-not-allowed"
+              type="text"
+              value={fechaTentativa ? formatearFechaLarga(fechaTentativa) : ''}
+              placeholder="Se calcula automáticamente"
+              className="w-full p-2.5 border border-[#E2DACB] rounded-xl text-sm bg-slate-100 text-slate-700 font-semibold capitalize cursor-not-allowed"
             />
           </div>
           <div className="space-y-1">

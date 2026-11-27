@@ -20,6 +20,7 @@ interface ExpedienteItem {
   apMaterno: string;
   numeroCuenta: string;
   tipoPrograma: string;
+  horasRequeridas?: number;
   modalidad: string;
   cicloEscolar: string;
   estatus: string;
@@ -33,6 +34,8 @@ interface ExpedienteItem {
   } | null;
   carrera?: { nombre: string } | null;
   coordinador?: { nombreCompleto: string; gradoAcademico: string } | null;
+  supervisorGrado?: string | null;
+  supervisorNombre?: string | null;
 }
 
 export default function ExpedientesDirectory({ expedientes }: { expedientes: ExpedienteItem[] }) {
@@ -77,7 +80,8 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
         exp.clave.toLowerCase().includes(termino) ||
         (exp.carrera?.nombre ?? '').toLowerCase().includes(termino) ||
         (exp.plantel?.nombre ?? '').toLowerCase().includes(termino) ||
-        (exp.plantel?.institucion ?? '').toLowerCase().includes(termino);
+        (exp.plantel?.institucion ?? '').toLowerCase().includes(termino) ||
+        (exp.supervisorNombre ?? '').toLowerCase().includes(termino);
 
       // 2. Filtro programa
       const matchPrograma = filtroPrograma === 'TODOS' || exp.tipoPrograma === filtroPrograma;
@@ -204,7 +208,7 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
             type="text"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            placeholder="Buscar por nombre del alumno, número de cuenta (9 dígitos), clave institucional o carrera..."
+            placeholder="Buscar por nombre del alumno, número de cuenta / matrícula, folio o carrera..."
             className="w-full pl-11 pr-4 py-3 border-2 border-[#D5CDBC] rounded-xl text-sm bg-white text-[#0A1E42] placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-[#C68A2C]/20 focus:border-[#0A1E42] outline-none shadow-xs transition-all"
           />
         </div>
@@ -428,7 +432,9 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
                               : 'bg-[#C68A2C]/15 text-[#9E6B1D] border border-[#C68A2C]/30'
                           }`}
                         >
-                          {exp.tipoPrograma === 'SS' ? 'Servicio Social' : 'Prácticas'}
+                          {exp.tipoPrograma === 'SS'
+                            ? 'Servicio Social'
+                            : `Prácticas (${exp.horasRequeridas ?? 480} hrs)`}
                         </span>
                         <div className="text-[11px] text-[#5C6779] mt-1 capitalize">
                           {exp.modalidad}
@@ -464,6 +470,13 @@ export default function ExpedientesDirectory({ expedientes }: { expedientes: Exp
                           </span>
                           {exp.coordinador?.nombreCompleto ?? 'Sin asignar'}
                         </div>
+                        {exp.supervisorNombre && (
+                          <div className="text-[11px] text-[#5C6779] mt-0.5">
+                            <span className="font-semibold text-[#008A7C]">Sup.:</span>{' '}
+                            {exp.supervisorGrado ? `${exp.supervisorGrado} ` : ''}
+                            {exp.supervisorNombre}
+                          </div>
+                        )}
                       </td>
 
                       {/* Fechas */}

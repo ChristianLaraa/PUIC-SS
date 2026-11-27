@@ -7,6 +7,7 @@ import {
   LayoutDashboard, 
   FolderOpen, 
   UserPlus, 
+  Building2,
   LogOut, 
   ChevronRight 
 } from 'lucide-react';
@@ -63,6 +64,11 @@ export default function Sidebar({ user }: SidebarProps) {
       href: '/expedientes/nuevo', 
       icon: UserPlus,
       destacado: true
+    },
+    {
+      name: 'Instituciones y Escuelas',
+      href: '/planteles',
+      icon: Building2,
     },
   ];
 
@@ -235,7 +241,7 @@ export default function Sidebar({ user }: SidebarProps) {
           UNAM • PUIC
         </p>
         <p className="text-[9px] text-[#C68A2C]/80 italic mt-0.5">
-          "La UNAM y la pluriculturalidad"
+          &ldquo;La UNAM y la pluriculturalidad&rdquo;
         </p>
       </div>
     </aside>

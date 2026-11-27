@@ -5,9 +5,16 @@ export const GRADOS_ACADEMICOS = [
     'Dr.',
     'Dra.',
     'Ing.',
+    'C.P.',
     'Esp.',
     'C.',
   ];
+
+  export const HORAS_PRACTICAS_PROFESIONALES = [
+    { horas: 240, etiqueta: '240 hrs (3 meses)', mesesTexto: '3 meses' },
+    { horas: 360, etiqueta: '360 hrs (4 meses y 15 días)', mesesTexto: '4.5 meses' },
+    { horas: 480, etiqueta: '480 hrs (6 meses)', mesesTexto: '6 meses' },
+  ] as const;
 
   export const SEMESTRES_UNAM = [
     '6to Semestre',

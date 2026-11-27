@@ -3,7 +3,11 @@
 import { prisma } from '../lib/db';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { generarFolioExpediente } from '@/lib/helpers';
+import {
+  generarFolioExpediente,
+  calcularFechaTentativa,
+  esFinDeSemana,
+} from '@/lib/helpers';
 
 export async function obtenerSiguienteNumeroFolio(): Promise<number> {
   const [total, ultimo] = await Promise.all([
@@ -191,7 +195,7 @@ export async function registrarExpediente(data: {
   numeroCuenta: string;
   correoElectronico: string;
   telefono: string;
-  edad: number;
+  edad?: number | null;
   sexo: string;
   semestre: string;
   // Adscripción
@@ -202,21 +206,56 @@ export async function registrarExpediente(data: {
   carreraNombre: string;
   // Programa
   tipoPrograma: string;
+  horasRequeridas?: number;
   clavePrograma: string;
   nombrePrograma: string;
   cicloEscolar: string;
   ubicacionDependencia: string;
   modalidad: string;
   turno: string;
-  // Coordinador
+  // Coordinador y Supervisor
   coordinadorGrado: string;
   coordinadorNombre: string;
+  supervisorGrado?: string | null;
+  supervisorNombre?: string | null;
   // Tiempos
   fechaInicio: string;
   fechaTentativa: string;
   preRegistro?: string;
   registro?: string;
 }) {
+  if (!data.fechaInicio || esFinDeSemana(data.fechaInicio)) {
+    throw new Error('La fecha de inicio debe ser un día hábil (lunes a viernes).');
+  }
+
+  const tipoProgramaNormalizado: 'SS' | 'PP' = data.tipoPrograma === 'PP' ? 'PP' : 'SS';
+  const horasPermitidasPP = [240, 360, 480];
+  const horasEfectivas =
+    tipoProgramaNormalizado === 'SS'
+      ? 480
+      : horasPermitidasPP.includes(Number(data.horasRequeridas))
+      ? Number(data.horasRequeridas)
+      : 480;
+
+  const fechaTentativaCalculada = calcularFechaTentativa(
+    data.fechaInicio,
+    tipoProgramaNormalizado,
+    horasEfectivas
+  );
+
+  const edadNormalizada =
+    data.edad !== null &&
+    data.edad !== undefined &&
+    String(data.edad).trim() !== '' &&
+    !Number.isNaN(Number(data.edad))
+      ? Number(data.edad)
+      : null;
+
+  const supervisorNombreLimpio = data.supervisorNombre?.trim() || null;
+  const supervisorGradoLimpio = supervisorNombreLimpio
+    ? data.supervisorGrado?.trim() || null
+    : null;
+
   const nombrePlantelLimpio = data.plantelNombre.trim();
   const institucionLimpia = data.plantelInstitucion?.trim() || (data.esUnam !== false ? 'UNAM' : 'Externa');
   const esUnam = data.esUnam ?? (institucionLimpia.toUpperCase().includes('UNAM'));
@@ -234,6 +273,7 @@ export async function registrarExpediente(data: {
       institucion: institucionLimpia,
       esUnam,
       siglas: data.plantelSiglas?.trim() || null,
+      activo: true,
     },
   });
 
@@ -285,15 +325,16 @@ export async function registrarExpediente(data: {
       nombre: data.nombre,
       apPaterno: data.apPaterno,
       apMaterno: data.apMaterno,
-      numeroCuenta: data.numeroCuenta,
+      numeroCuenta: data.numeroCuenta.trim(),
       correoElectronico: data.correoElectronico,
       telefono: data.telefono,
-      edad: Number(data.edad),
+      edad: edadNormalizada,
       sexo: data.sexo,
       semestre: data.semestre,
       idPlantel: plantel.idPlantel,
       idCarrera: carrera.idCarrera,
-      tipoPrograma: data.tipoPrograma,
+      tipoPrograma: tipoProgramaNormalizado,
+      horasRequeridas: horasEfectivas,
       clavePrograma: data.clavePrograma,
       nombrePrograma: data.nombrePrograma,
       cicloEscolar: data.cicloEscolar,
@@ -301,8 +342,10 @@ export async function registrarExpediente(data: {
       modalidad: data.modalidad,
       turno: data.turno,
       idCoordinador: coordinador.idCoordinador,
+      supervisorGrado: supervisorGradoLimpio,
+      supervisorNombre: supervisorNombreLimpio,
       fechaInicio: new Date(data.fechaInicio),
-      fechaTentativa: new Date(data.fechaTentativa),
+      fechaTentativa: new Date(fechaTentativaCalculada || data.fechaTentativa),
       seguimiento: {
         create: {
           preRegistro: data.preRegistro ? new Date(data.preRegistro) : null,

@@ -23,6 +23,7 @@ model Plantel {
   siglas      String?
   institucion String       @default("UNAM") // Ej. "UNAM", "IPN", "UAM", "UAEMex", "TecNM", "Privada", etc.
   esUnam      Boolean      @default(true)
+  activo      Boolean      @default(true)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt @default(now())
   expedientes Expediente[]
@@ -49,10 +50,10 @@ model Expediente {
   nombre               String
   apPaterno            String
   apMaterno            String
-  numeroCuenta         String                // 9 dígitos UNAM
+  numeroCuenta         String                // Alfanumérico (UNAM o matrícula externa)
   correoElectronico    String
   telefono             String
-  edad                 Int
+  edad                 Int?
   sexo                 String                // "H", "M", "O"
   semestre             String                // "6to", "7mo", "8vo", etc.
   
@@ -64,6 +65,7 @@ model Expediente {
   
   // Datos del Programa
   tipoPrograma         String                // "SS" | "PP"
+  horasRequeridas      Int                   @default(480) // SS: 480 | PP: 240, 360 o 480
   clavePrograma        String                // Clave oficial DGOAE / SIASS
   nombrePrograma       String                // Nombre oficial del programa registrado
   cicloEscolar         String                // "2026-1", "2026-2", etc.
@@ -73,6 +75,8 @@ model Expediente {
   
   idCoordinador        Int
   coordinador          Coordinador           @relation(fields: [idCoordinador], references: [idCoordinador])
+  supervisorGrado      String?               // Bajo la supervisión de: grado académico (opcional)
+  supervisorNombre     String?               // Bajo la supervisión de: nombre completo (opcional)
   
   // Tiempos y Control
   fechaInicio          DateTime

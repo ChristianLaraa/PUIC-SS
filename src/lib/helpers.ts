@@ -10,6 +10,45 @@ function normalizarFecha(fecha: Date | string): Date {
   return d;
 }
 
+function formatearFechaISO(d: Date): string {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function sumarMesesSeguro(anio: number, mesIdx: number, dia: number, meses: number): Date {
+  const totalMeses = mesIdx + meses;
+  const nuevoAnio = anio + Math.floor(totalMeses / 12);
+  const nuevoMes = ((totalMeses % 12) + 12) % 12;
+  const ultimoDiaMes = new Date(nuevoAnio, nuevoMes + 1, 0).getDate();
+  return new Date(nuevoAnio, nuevoMes, Math.min(dia, ultimoDiaMes));
+}
+
+/**
+ * Devuelve true si la fecha corresponde a sábado (6) o domingo (0).
+ */
+export function esFinDeSemana(fecha: Date | string): boolean {
+  if (!fecha) return false;
+  const d = normalizarFecha(fecha);
+  const diaSemana = d.getDay();
+  return diaSemana === 0 || diaSemana === 6;
+}
+
+/**
+ * Si la fecha cae en sábado o domingo, la recorre al lunes siguiente.
+ */
+export function ajustarADiaHabilSiguiente(fecha: Date): Date {
+  const d = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+  const diaSemana = d.getDay();
+  if (diaSemana === 6) {
+    d.setDate(d.getDate() + 2);
+  } else if (diaSemana === 0) {
+    d.setDate(d.getDate() + 1);
+  }
+  return d;
+}
+
 export function obtenerDiasRestantes(fechaTentativa: Date | string) {
   const hoy = normalizarFecha(new Date());
   const fecha = normalizarFecha(fechaTentativa);
@@ -44,16 +83,47 @@ export function generarClaveExpediente(
   return generarFolioExpediente(fechaInicio, consecutivo);
 }
 
-
-export function calcularFechaTentativa(fechaInicio: string): string {
+/**
+ * Calcula la fecha tentativa de término de acuerdo al tipo de programa y horas:
+ * - Servicio Social (SS) o 480 hrs: +6 meses calendario
+ * - Prácticas Profesionales (PP) 360 hrs: +4 meses y 15 días (4.5 meses)
+ * - Prácticas Profesionales (PP) 240 hrs: +3 meses calendario
+ * Si la fecha calculada cae en sábado o domingo, se ajusta al lunes siguiente.
+ */
+export function calcularFechaTentativa(
+  fechaInicio: string,
+  tipoPrograma: 'SS' | 'PP' = 'SS',
+  horasRequeridas: number = 480
+): string {
   if (!fechaInicio) return '';
-  const [anio, mes, dia] = fechaInicio.split('-').map(Number);
-  const d = new Date(anio, mes - 1, dia);
-  d.setMonth(d.getMonth() + 6);
+  const [anio, mes, dia] = fechaInicio.split('T')[0].split('-').map(Number);
+  if (!anio || !mes || !dia) return '';
 
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
+  const horasEfectivas = tipoPrograma === 'SS' ? 480 : horasRequeridas;
 
-  return `${yyyy}-${mm}-${dd}`;
+  let fechaCalculada: Date;
+  if (horasEfectivas === 240) {
+    fechaCalculada = sumarMesesSeguro(anio, mes - 1, dia, 3);
+  } else if (horasEfectivas === 360) {
+    fechaCalculada = sumarMesesSeguro(anio, mes - 1, dia, 4);
+    fechaCalculada.setDate(fechaCalculada.getDate() + 15);
+  } else {
+    fechaCalculada = sumarMesesSeguro(anio, mes - 1, dia, 6);
+  }
+
+  const fechaHabil = ajustarADiaHabilSiguiente(fechaCalculada);
+  return formatearFechaISO(fechaHabil);
+}
+
+export function describirPlazoPrograma(
+  tipoPrograma: string,
+  horasRequeridas?: number | null
+): string {
+  if (tipoPrograma === 'SS') {
+    return '6 meses · 480 hrs';
+  }
+  const horas = horasRequeridas ?? 480;
+  if (horas === 240) return '3 meses · 240 hrs';
+  if (horas === 360) return '4.5 meses · 360 hrs';
+  return '6 meses · 480 hrs';
 }

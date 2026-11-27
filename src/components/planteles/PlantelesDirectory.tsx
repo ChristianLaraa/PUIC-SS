@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useTransition, useMemo } from 'react';
-import { crearPlantel, actualizarPlantel, eliminarPlantel } from '@/actions/planteles';
+import {
+  crearPlantel,
+  actualizarPlantel,
+  eliminarPlantel,
+  cambiarEstadoPlantel,
+} from '@/actions/planteles';
 import { INSTITUCIONES_DISPONIBLES } from '@/lib/constants/catalogos';
 import {
   School,
@@ -16,6 +21,8 @@ import {
   AlertCircle,
   Filter,
   X,
+  PowerOff,
+  RotateCcw,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -25,6 +32,7 @@ interface PlantelWithCount {
   siglas: string | null;
   institucion: string;
   esUnam: boolean;
+  activo: boolean;
   createdAt: Date;
   _count: {
     expedientes: number;
@@ -37,6 +45,8 @@ interface PlantelesDirectoryProps {
     totalPlanteles: number;
     totalUnam: number;
     totalExternos: number;
+    totalActivos?: number;
+    totalInactivos?: number;
   };
 }
 
@@ -47,6 +57,7 @@ export default function PlantelesDirectory({ planteles, stats }: PlantelesDirect
   const [busqueda, setBusqueda] = useState('');
   const [filtroTipo, setFiltroTipo] = useState<'TODAS' | 'UNAM' | 'EXTERNA'>('TODAS');
   const [filtroInstitucion, setFiltroInstitucion] = useState('TODAS');
+  const [filtroEstado, setFiltroEstado] = useState<'TODAS' | 'ACTIVAS' | 'BAJA'>('TODAS');
 
   // Estados del Modal / Formulario
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -91,9 +102,17 @@ export default function PlantelesDirectory({ planteles, stats }: PlantelesDirect
       const matchInstitucion =
         filtroInstitucion === 'TODAS' || p.institucion === filtroInstitucion;
 
-      return matchTexto && matchTipo && matchInstitucion;
+      // Filtro Estado (Activas vs Dadas de baja)
+      const matchEstado =
+        filtroEstado === 'TODAS'
+          ? true
+          : filtroEstado === 'ACTIVAS'
+          ? p.activo !== false
+          : p.activo === false;
+
+      return matchTexto && matchTipo && matchInstitucion && matchEstado;
     });
-  }, [planteles, busqueda, filtroTipo, filtroInstitucion]);
+  }, [planteles, busqueda, filtroTipo, filtroInstitucion, filtroEstado]);
 
   function abrirCrear() {
     setPlantelEnEdicion(null);
@@ -169,17 +188,43 @@ export default function PlantelesDirectory({ planteles, stats }: PlantelesDirect
     });
   }
 
+  function handleToggleEstado(p: PlantelWithCount) {
+    const nuevoEstado = !p.activo;
+    const mensajeConfirm = nuevoEstado
+      ? `¿Reactivar "${p.nombre}" para que vuelva a aparecer en el registro de nuevos alumnos?`
+      : `¿Dar de baja "${p.nombre}"? Ya no aparecerá en el registro de nuevos alumnos, pero se conservarán sus expedientes históricos.`;
+
+    if (confirm(mensajeConfirm)) {
+      startTransition(async () => {
+        try {
+          await cambiarEstadoPlantel(p.idPlantel, nuevoEstado);
+          setMensajeExito(
+            nuevoEstado
+              ? `"${p.nombre}" reactivada exitosamente.`
+              : `"${p.nombre}" dada de baja del catálogo activo.`
+          );
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            alert(err.message);
+          }
+        }
+      });
+    }
+  }
+
   function handleEliminar(p: PlantelWithCount) {
     if (p._count.expedientes > 0) {
-      alert(`No es posible eliminar "${p.nombre}" porque cuenta con ${p._count.expedientes} expediente(s) activo(s).`);
+      alert(
+        `No es posible eliminar definitivamente "${p.nombre}" porque cuenta con ${p._count.expedientes} expediente(s) asociado(s). Puedes darla de baja temporalmente con el botón de desactivar.`
+      );
       return;
     }
 
-    if (confirm(`¿Estás seguro de que deseas eliminar "${p.nombre}"?`)) {
+    if (confirm(`¿Estás seguro de que deseas eliminar permanentemente "${p.nombre}"?`)) {
       startTransition(async () => {
         try {
           await eliminarPlantel(p.idPlantel);
-          setMensajeExito('Plantel eliminado con éxito.');
+          setMensajeExito('Plantel eliminado permanentemente con éxito.');
         } catch (err: unknown) {
           if (err instanceof Error) {
             alert(err.message);
@@ -212,7 +257,7 @@ export default function PlantelesDirectory({ planteles, stats }: PlantelesDirect
             className="flex items-center gap-2 bg-[#0A1E42] hover:bg-[#06132A] text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm border-b-2 border-[#C68A2C] transition-all cursor-pointer"
           >
             <PlusCircle size={18} className="text-[#DF9F38]" />
-            Agregar Escuela No UNAM / Externa
+            Dar de Alta Institución / Escuela
           </button>
         </div>
       </div>
@@ -267,7 +312,7 @@ export default function PlantelesDirectory({ planteles, stats }: PlantelesDirect
       <div className="bg-white p-5 rounded-2xl border border-[#E2DACB] shadow-xs space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
           {/* Barra de búsqueda */}
-          <div className="md:col-span-6 relative">
+          <div className="md:col-span-4 relative">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
@@ -326,6 +371,19 @@ export default function PlantelesDirectory({ planteles, stats }: PlantelesDirect
               ))}
             </select>
           </div>
+
+          {/* Filtro Estado */}
+          <div className="md:col-span-2">
+            <select
+              value={filtroEstado}
+              onChange={(e) => setFiltroEstado(e.target.value as 'TODAS' | 'ACTIVAS' | 'BAJA')}
+              className="w-full p-2.5 bg-[#FBF9F5] border border-[#E2DACB] rounded-xl text-xs sm:text-sm text-[#0E1B2E] focus:outline-none focus:ring-2 focus:ring-[#C68A2C] transition-all"
+            >
+              <option value="TODAS">Todos los estatus</option>
+              <option value="ACTIVAS">Activas</option>
+              <option value="BAJA">Dadas de baja</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -339,6 +397,7 @@ export default function PlantelesDirectory({ planteles, stats }: PlantelesDirect
                 <th className="p-4 tracking-wider">Institución</th>
                 <th className="p-4 tracking-wider">Siglas</th>
                 <th className="p-4 text-center tracking-wider">Origen</th>
+                <th className="p-4 text-center tracking-wider">Estatus</th>
                 <th className="p-4 text-center tracking-wider">Expedientes</th>
                 <th className="p-4 text-right tracking-wider">Acciones</th>
               </tr>
@@ -346,7 +405,7 @@ export default function PlantelesDirectory({ planteles, stats }: PlantelesDirect
             <tbody className="divide-y divide-[#E2DACB]/60">
               {plantelesFiltrados.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-12 text-center">
+                  <td colSpan={7} className="p-12 text-center">
                     <div className="max-w-sm mx-auto space-y-3">
                       <div className="w-12 h-12 rounded-full bg-[#F5F0E6] text-[#9E6B1D] flex items-center justify-center mx-auto">
                         <Filter size={24} />
@@ -369,9 +428,16 @@ export default function PlantelesDirectory({ planteles, stats }: PlantelesDirect
                 </tr>
               ) : (
                 plantelesFiltrados.map((p) => (
-                  <tr key={p.idPlantel} className="hover:bg-[#FBF9F5] transition-colors">
+                  <tr
+                    key={p.idPlantel}
+                    className={`hover:bg-[#FBF9F5] transition-colors ${
+                      !p.activo ? 'bg-slate-50/80 opacity-75' : ''
+                    }`}
+                  >
                     <td className="p-4">
-                      <div className="font-bold text-[#0A1E42] text-sm">{p.nombre}</div>
+                      <div className={`font-bold text-sm ${p.activo ? 'text-[#0A1E42]' : 'text-slate-500 line-through'}`}>
+                        {p.nombre}
+                      </div>
                     </td>
                     <td className="p-4">
                       <div className="text-xs text-[#0E1B2E] font-medium">{p.institucion}</div>
@@ -398,6 +464,17 @@ export default function PlantelesDirectory({ planteles, stats }: PlantelesDirect
                       </span>
                     </td>
                     <td className="p-4 text-center">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                          p.activo
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200'
+                        }`}
+                      >
+                        {p.activo ? '● Activa' : '● Baja'}
+                      </span>
+                    </td>
+                    <td className="p-4 text-center">
                       <Link
                         href={`/expedientes?q=${encodeURIComponent(p.nombre)}`}
                         className="inline-flex items-center gap-1 text-xs font-bold text-[#0A1E42] hover:text-[#C68A2C] bg-[#F5F0E6] px-2.5 py-1 rounded-full transition-colors"
@@ -416,11 +493,24 @@ export default function PlantelesDirectory({ planteles, stats }: PlantelesDirect
                         >
                           <Edit2 size={15} />
                         </button>
-                        {!p.esUnam && p._count.expedientes === 0 && (
+                        <button
+                          onClick={() => handleToggleEstado(p)}
+                          disabled={isPending}
+                          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                            p.activo
+                              ? 'text-amber-600 hover:text-rose-700 hover:bg-rose-50'
+                              : 'text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50'
+                          }`}
+                          title={p.activo ? 'Dar de baja del catálogo' : 'Reactivar escuela'}
+                        >
+                          {p.activo ? <PowerOff size={15} /> : <RotateCcw size={15} />}
+                        </button>
+                        {p._count.expedientes === 0 && (
                           <button
                             onClick={() => handleEliminar(p)}
+                            disabled={isPending}
                             className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                            title="Eliminar plantel"
+                            title="Eliminar permanentemente"
                           >
                             <Trash2 size={15} />
                           </button>
@@ -445,7 +535,7 @@ export default function PlantelesDirectory({ planteles, stats }: PlantelesDirect
                   <Building2 size={18} />
                 </span>
                 <h3 className="text-base font-bold text-[#0A1E42]">
-                  {plantelEnEdicion ? 'Editar Escuela / Plantel' : 'Registrar Nueva Escuela No UNAM'}
+                  {plantelEnEdicion ? 'Editar Institución / Escuela' : 'Dar de Alta Institución / Escuela'}
                 </h3>
               </div>
               <button

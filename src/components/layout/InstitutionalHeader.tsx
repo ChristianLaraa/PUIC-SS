@@ -11,6 +11,7 @@ import {
   LayoutDashboard, 
   FolderOpen, 
   UserPlus, 
+  Building2,
   LogOut
 } from 'lucide-react';
 import { cerrarSesion } from '@/actions/auth';
@@ -28,6 +29,7 @@ export default function InstitutionalHeader({ user }: InstitutionalHeaderProps) 
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
     { name: 'Expedientes', href: '/expedientes', icon: FolderOpen },
     { name: 'Alta de Alumno', href: '/expedientes/nuevo', icon: UserPlus },
+    { name: 'Instituciones y Escuelas', href: '/planteles', icon: Building2 },
   ];
 
   return (
